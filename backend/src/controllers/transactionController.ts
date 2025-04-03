@@ -7,8 +7,9 @@ import { GetTransactionRes, GetTransactionsRes, ResponseAdv } from '@ddlabel/sha
 import { AuthRequest } from '../types';
 import { resHeaderError } from '../utils/errors';
 import { NotFoundError } from '../utils/errorClasses';
+import { NextFunction } from 'express';
 
-export const getTransactions = async (req: AuthRequest, res: ResponseAdv<GetTransactionsRes>) => {
+export const getTransactions = async (req: AuthRequest, res: ResponseAdv<GetTransactionsRes>, next: NextFunction) => {
   const limit = parseInt(req.query.limit as string) || 100; // Default limit to 20 if not provided
   const offset = parseInt(req.query.offset as string) || 0; // 
   const userId = req.user.id; 
@@ -36,11 +37,11 @@ export const getTransactions = async (req: AuthRequest, res: ResponseAdv<GetTran
     });
     return res.json({ total, transactions });
   } catch (error: any) {
-    return resHeaderError('getTransactions', error, req.query, res);
+    return resHeaderError('getTransactions', error, req.query, res, next);
   }
 };
 
-export const getTransactionById = async (req: AuthRequest, res: ResponseAdv<GetTransactionRes>) => {
+export const getTransactionById = async (req: AuthRequest, res: ResponseAdv<GetTransactionRes>, next: NextFunction) => {
   try {
     const transaction = await Transaction.findByPk(req.params.id, {
       include: [
@@ -53,6 +54,6 @@ export const getTransactionById = async (req: AuthRequest, res: ResponseAdv<GetT
     }
     return res.json({transaction});
   } catch (error: any) {
-    return resHeaderError('getTransactionById', error, req.params, res);
+    return resHeaderError('getTransactionById', error, req.params, res, next);
   }
 }

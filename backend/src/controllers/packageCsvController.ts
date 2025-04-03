@@ -9,6 +9,7 @@ import { getRelationQuery } from './packageControllerUtil';
 import { v4 as uuidv4 } from 'uuid';
 import { parse } from 'json2csv'; // Import parse from json2csv
 import { resHeaderError } from '../utils/errors';
+import { NextFunction } from 'express';
 
 const csvFieldsMapping = [
   { label: 'id', value: 'id' },
@@ -38,7 +39,7 @@ const csvFieldsMapping = [
   { label: 'fromAddressZip', value: 'fromAddress.zip' },
 ];
 
-export const getCsvPackages = async (req: AuthRequest, res: ResponseAdv<GetPackagesCsvRes>) => {
+export const getCsvPackages = async (req: AuthRequest, res: ResponseAdv<GetPackagesCsvRes>, next: NextFunction) => {
   const relationQuery = getRelationQuery(req);
   try {
     const packages = await Package.findAll({
@@ -60,11 +61,10 @@ export const getCsvPackages = async (req: AuthRequest, res: ResponseAdv<GetPacka
     const packagesData = packages.map(pkg => pkg.toJSON());
     // Convert JSON to CSV
     const csv = parse(packagesData, { fields: csvFieldsMapping });
-
     res.header('Content-Type', 'text/csv');
     res.header('Content-Disposition', `attachment; filename="packages_${uuidv4()}.csv"`);
     return res.send(csv);
   } catch (error: any) {
-    return resHeaderError('getCsvPackages', error, req.query, res);
+    return resHeaderError('getCsvPackages', error, req.query, res, next);
   }
 };

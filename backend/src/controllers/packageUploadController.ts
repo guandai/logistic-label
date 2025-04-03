@@ -8,8 +8,9 @@ import { AuthRequest, BatchDataType, CsvData } from '../types';
 import { onData, onEnd, onError } from './packageStreamFuntions';
 import { resHeaderError } from '../utils/errors';
 import { InvalidInputError } from '../utils/errorClasses';
+import { NextFunction } from 'express';
 
-export const importPackages = async (req: AuthRequest, res: ResponseAdv<ImportPackageRes>) => {
+export const importPackages = async (req: AuthRequest, res: ResponseAdv<ImportPackageRes>, next: NextFunction) => {
 	const { file } = req;
 	try {
 		if (!file) {
@@ -33,7 +34,7 @@ export const importPackages = async (req: AuthRequest, res: ResponseAdv<ImportPa
 			.on('end', async () => onEnd({ req, res, pkgGlobal, file }))
 			.on('error', (error: any) => onError( error, pkgGlobal ));
 	} catch (error: any) {
-		return resHeaderError('importPackages', error, req.file, res);
+		return resHeaderError('importPackages', error, req.file, res, next);
 	}
 };
 

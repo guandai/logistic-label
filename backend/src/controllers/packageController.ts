@@ -19,8 +19,9 @@ import { generateTrackingNo } from '../utils/generateTrackingNo';
 import { getRelationQuery } from './packageControllerUtil';
 import { resHeaderError } from '../utils/errors';
 import { NotFoundError } from '../utils/errorClasses';
+import { NextFunction } from 'express';
 
-export const createPackage = async (req: AuthRequest, res: ResponseAdv<CreatePackageRes>) => {
+export const createPackage = async (req: AuthRequest, res: ResponseAdv<CreatePackageRes>, next: NextFunction) => {
   if (!req.user) {
     throw new NotFoundError('User not found');
   }
@@ -49,13 +50,14 @@ export const createPackage = async (req: AuthRequest, res: ResponseAdv<CreatePac
     const a = await Address.createWithInfo(fromAddress);
     await Address.createWithInfo(toAddress);
 
-    return res.status(201).json({ success: true, packageId: pkg.id });
+    res.status(201).json({ success: true, packageId: pkg.id });
+    return void 0;
   } catch (error: any) {
-    return resHeaderError('createPackage', error, {...req.body, user: req.user}, res);
+    return resHeaderError('createPackage', error, {...req.body, user: req.user}, res, next);
   }
 };
 
-export const getPackages = async (req: AuthRequest, res: ResponseAdv<GetPackagesRes>) => {
+export const getPackages = async (req: AuthRequest, res: ResponseAdv<GetPackagesRes>, next: NextFunction) => {
   const limit = parseInt(req.query.limit as string) || 100; // Default limit to 20 if not provided
   const offset = parseInt(req.query.offset as string) || 0; // 
   const relationQuery = getRelationQuery(req);
@@ -70,11 +72,11 @@ export const getPackages = async (req: AuthRequest, res: ResponseAdv<GetPackages
     return res.json({ total: rows.count, packages: rows.rows });
   } catch (error: any) {
     logger.error(`Error in getPackages: ${error}`);
-    return resHeaderError('getPackages', error, req.query, res);
+    return resHeaderError('getPackages', error, req.query, res, next);
   }
 };
 
-export const updatePackage = async (req: AuthRequest, res: ResponseAdv<Package>) => {
+export const updatePackage = async (req: AuthRequest, res: ResponseAdv<Package>, next: NextFunction) => {
   const { fromAddress, toAddress, ...rest }: UpdatePackageReq = req.body;
   try {
     const pkg = await Package.findByPk(req.params.id);
@@ -87,11 +89,11 @@ export const updatePackage = async (req: AuthRequest, res: ResponseAdv<Package>)
     await pkg.update(rest);
     return res.json(pkg);
   } catch (error: any) {
-    return resHeaderError('updatePackage', error, req.body, res);
+    return resHeaderError('updatePackage', error, req.body, res, next);
   }
 };
 
-export const deletePackage = async (req: AuthRequest, res: ResponseAdv<SimpleRes>) => {
+export const deletePackage = async (req: AuthRequest, res: ResponseAdv<SimpleRes>, next: NextFunction) => {
   try {
     const pkg = await Package.findByPk(req.params.id);
     if (!pkg) {
@@ -103,11 +105,11 @@ export const deletePackage = async (req: AuthRequest, res: ResponseAdv<SimpleRes
     await Package.destroy({ where: { id: pkg.id } });
     return res.json({ message: 'Package deleted' });
   } catch (error: any) {
-    return resHeaderError('deletePackage', error, req.params, res);
+    return resHeaderError('deletePackage', error, req.params, res, next);
   }
 };
 
-export const getPackage = async (req: AuthRequest, res: ResponseAdv<GetPackageRes>) => {
+export const getPackage = async (req: AuthRequest, res: ResponseAdv<GetPackageRes>, next: NextFunction) => {
   const { id } = req.params;
   try {
     const pkg: Package | null = await Package.findOne({
@@ -124,6 +126,6 @@ export const getPackage = async (req: AuthRequest, res: ResponseAdv<GetPackageRe
     }
     return res.json({ package: pkg });
   } catch (error: any) {
-    return resHeaderError('getPackage', error, req.params, res);
+    return resHeaderError('getPackage', error, req.params, res, next);
   }
 };

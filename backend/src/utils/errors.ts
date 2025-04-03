@@ -1,7 +1,7 @@
 import { ResponseAdv } from "@ddlabel/shared";
 import moment from "moment";
 import { UniqueConstraintError } from "sequelize";
-import { Response } from "express";
+import { NextFunction, Response } from "express";
 import logger from "../config/logger";
 import { aggregateError, getErrorRes } from "./getErrorRes";
 import { BatchCreationError } from "./errorClasses";
@@ -44,12 +44,14 @@ export const ReturnMsg = <T>(res: ResponseAdv<T>, message: string, code = 400) =
 export const isDateValid = (date: string) => moment(date, moment.ISO_8601, true).isValid();
 
 
-export const resHeaderError = (fnName: string, error: any, data: unknown, res: Response) => {
+export const resHeaderError = (fnName: string, error: any, data: unknown, res: Response, next: NextFunction) => {
 	logger.error(`Error in ${fnName} -> ${error} .`);
 	logger.error(`Data  in ${fnName} -> ${data} .`);
 	const errorRes = getErrorRes({fnName, error, data});
-	return res.status(errorRes.status).json({
+	const json = {
 		message: errorRes.message,
 		errors: errorRes.errors,
-	});
+	}
+	// next(json);
+	res.status(500).json(json);
 }

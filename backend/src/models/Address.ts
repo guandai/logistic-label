@@ -40,12 +40,6 @@ class Address extends Model<AddressAttributes, AddressCreationAttributes> implem
     await Address.update(attr,  { where: { id: attr.id } });
   }
 
-  public static async bulkCreateWithInfo(attrs: AddressCreationAttributes[]) {
-    // attrs = await Promise.all(attrs.map(async (attr) => await fixCityState(attr))); 
-    // fixCityState by getZipInfo already done is getPreparedData()
-    attrs = await Promise.all(attrs.map(async (attr) => await fixPort(attr))); 
-    await Address.bulkCreate(attrs);
-  }
 
   public static async bulkCreateWithInfo(attrs: AddressCreationAttributes[]) {
     const fixedAttrs = await Promise.all(attrs.map(async (attr) => await fixCityState(attr))); 

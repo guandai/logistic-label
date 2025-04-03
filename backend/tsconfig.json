@@ -7,7 +7,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "dist"  // Add this line
+    "outDir": "dist" 
   },
   "include": ["src/**/*", "src/config"],
   "exclude": ["node_modules"],

@@ -1,11 +1,10 @@
 {
   "name": "ddlabel",
   "version": "1.0.0",
-  "private": true,
   "workspaces": [
+    "shared",
     "frontend",
-    "backend",
-    "shared"
+    "backend"
   ],
   "scripts": {
     "prod-frontend": "yarn workspace @ddlabel/frontend prod",
@@ -16,14 +15,15 @@
     "start-backend": "yarn workspace @ddlabel/backend start",
     "start-shared": "yarn workspace @ddlabel/shared start",
     "start": "concurrently \"yarn start-shared\" \"yarn start-frontend\" \"yarn start-backend\"",
-    "build-backend": "yarn workspace @ddlabel/backend build",
-    "build-frontend": "yarn workspace @ddlabel/frontend build",
     "build-shared": "yarn workspace @ddlabel/shared build",
-    "build": "yarn build-backend && yarn build-frontend && yarn build-shared"
+    "build-frontend": "yarn workspace @ddlabel/frontend build",
+    "build-backend": "yarn workspace @ddlabel/backend build",
+    "build": "yarn build-shared && yarn build-frontend && yarn build-backend"
   },
   "devDependencies": {
     "@types/papaparse": "^5.3.14",
     "concurrently": "^6.0.0",
     "pm2": "^5.4.1"
-  }
+  },
+  "packageManager": "yarn@4.8.1"
 }

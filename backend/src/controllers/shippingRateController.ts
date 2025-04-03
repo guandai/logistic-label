@@ -1,5 +1,5 @@
 // backend/src/controllers/shippingRateController.ts
-import { Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { ShippingRate } from '../models/ShippingRate';
 import { Op } from 'sequelize';
 import { FullRateReq, VolumeUnit, WeightUnit } from '@ddlabel/shared';
@@ -65,16 +65,16 @@ export const getShippingRatesForWeight = async (weight: number, unit: string): P
   return data;
 }
 
-export const getShippingRates = async (req: AuthRequest, res: Response) => {
+export const getShippingRates = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const rates = await ShippingRate.findAll();
     return res.json(rates);
   } catch (error: any) {
-    return resHeaderError('getShippingRates', error, req.params, res);
+    return resHeaderError('getShippingRates', error, req.params, res, next);
   }
 };
 
-export const getFullRate = async (req: AuthRequest, res: Response) => {
+export const getFullRate = async (req: AuthRequest, res: Response, next: NextFunction) => {
   let { length, width, height, weight, zone, weightUnit, volumeUnit } = req.query;
 
   if (!length || !width || !height || !weight || !zone || !weightUnit || !volumeUnit) {
@@ -98,7 +98,7 @@ export const getFullRate = async (req: AuthRequest, res: Response) => {
     };
     return res.json({ totalCost });
   } catch (error: any) {
-    return resHeaderError('getFullRate', error, req.params, res);
+    return resHeaderError('getFullRate', error, req.params, res, next);
   }
 };
 

@@ -92,7 +92,7 @@ const finishProcessing = (params: FinishEndParams) => {
 		return res.status(400).json({ errors: pkgGlobal.errorMap, message: `Importing Done with error: \n${messageMaps}${messagehash}` });
 	}
 	return res.json({ message: `Importing Done!` });
-	// return resHeaderError('getUsers', error, req.query, res);
+	// return resHeaderError('getUsers', error, req.query, res, next);
 }
 
 export const onEnd = async (params: OnEndParams) => {

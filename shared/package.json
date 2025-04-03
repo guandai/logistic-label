@@ -1,6 +1,7 @@
 {
 	"name": "@ddlabel/shared",
 	"version": "1.0.0",
+	"private": true,
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
@@ -8,9 +9,10 @@
 		"build": "tsc"
 	},
 	"devDependencies": {
-		"typescript": "^4.0.0"
+		"typescript": "^4.9.5"
 	},
 	"dependencies": {
+		"express": "^4.18.2",
 		"sequelize": "^6.37.3"
 	}
 }
