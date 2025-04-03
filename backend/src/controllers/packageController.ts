@@ -53,7 +53,7 @@ export const createPackage = async (req: AuthRequest, res: ResponseAdv<CreatePac
     res.status(201).json({ success: true, packageId: pkg.id });
     return void 0;
   } catch (error: any) {
-    return resHeaderError('createPackage', error, {...req.body, user: req.user}, res, next);
+    resHeaderError('createPackage', error, {...req.body, user: req.user}, res, next);
   }
 };
 
@@ -69,10 +69,10 @@ export const getPackages = async (req: AuthRequest, res: ResponseAdv<GetPackages
       offset,
     });
 
-    return res.json({ total: rows.count, packages: rows.rows });
+    res.json({ total: rows.count, packages: rows.rows });
   } catch (error: any) {
     logger.error(`Error in getPackages: ${error}`);
-    return resHeaderError('getPackages', error, req.query, res, next);
+    resHeaderError('getPackages', error, req.query, res, next);
   }
 };
 
@@ -87,9 +87,9 @@ export const updatePackage = async (req: AuthRequest, res: ResponseAdv<Package>,
     await Address.updateWithInfo(fromAddress);
     await Address.updateWithInfo(toAddress);
     await pkg.update(rest);
-    return res.json(pkg);
+    res.json(pkg);
   } catch (error: any) {
-    return resHeaderError('updatePackage', error, req.body, res, next);
+    resHeaderError('updatePackage', error, req.body, res, next);
   }
 };
 
@@ -103,9 +103,9 @@ export const deletePackage = async (req: AuthRequest, res: ResponseAdv<SimpleRes
     await Address.destroy({ where: { fromPackageId: pkg.id, addressType: AddressEnum.fromPackage } });
     await Address.destroy({ where: { toPackageId: pkg.id, addressType: AddressEnum.toPackage } });
     await Package.destroy({ where: { id: pkg.id } });
-    return res.json({ message: 'Package deleted' });
+    res.json({ message: 'Package deleted' });
   } catch (error: any) {
-    return resHeaderError('deletePackage', error, req.params, res, next);
+    resHeaderError('deletePackage', error, req.params, res, next);
   }
 };
 
@@ -124,8 +124,8 @@ export const getPackage = async (req: AuthRequest, res: ResponseAdv<GetPackageRe
     if (!pkg) {
       throw new NotFoundError(`Package not found - ${id}`);
     }
-    return res.json({ package: pkg });
+    res.json({ package: pkg });
   } catch (error: any) {
-    return resHeaderError('getPackage', error, req.params, res, next);
+    resHeaderError('getPackage', error, req.params, res, next);
   }
 };

@@ -54,4 +54,5 @@ export const resHeaderError = (fnName: string, error: any, data: unknown, res: R
 	}
 	// next(json);
 	res.status(500).json(json);
+	// return void 0;
 }

@@ -8,25 +8,27 @@ export const getPostalZone = async (req: AuthRequest, res: ResponseAdv<GetPostal
   try {
     const { zip } = req.query;
     if (!zip || typeof zip !== 'string') {
-      return ReturnMsg(res, '!Zip code is required' );
+      ReturnMsg(res, '!Zip code is required' );
+      return void 0;
     }
     const postalZone = await PostalZone.findOne({
       where: { zip },
     });
     if (postalZone) {
-      return res.json({ postalZone });
+      res.json({ postalZone });
     } else {
-      return ReturnMsg(res,`PostalZone not found by zip ${zip}`, 422);
+      ReturnMsg(res,`PostalZone not found by zip ${zip}`, 422);
     }
   } catch (error: any) {
-    return ReturnMsg(res, `getPostalZone Err: ${error.message}`);
+    ReturnMsg(res, `getPostalZone Err: ${error.message}`);
   }
 };
 
 export const getZone = async (req: AuthRequest, res: ResponseAdv<GetZoneRes>) => {
   const { fromZip, toZip } = req.query;
   if (typeof fromZip !== 'string' || typeof toZip !=='string') {
-    return ReturnMsg(res, 'fromZip and toZip code should be string' );
+    ReturnMsg(res, 'fromZip and toZip code should be string' );
+    return void 0;
   }
 
   try {
@@ -34,19 +36,22 @@ export const getZone = async (req: AuthRequest, res: ResponseAdv<GetZoneRes>) =>
     const toPostalZone: PostalZone | null = await PostalZone.findOne({ where: { zip: toZip }});
 
     if (!fromPostalZone) {
-      return ReturnMsg(res, `Can Not find From PostalZone by zip ${fromZip}`, 422);
+      ReturnMsg(res, `Can Not find From PostalZone by zip ${fromZip}`, 422);
+      return void 0;
     }
     if (!toPostalZone) {
-      return ReturnMsg(res, `Can Not find To PostalZone by zip ${toZip}`, 422);
+      ReturnMsg(res, `Can Not find To PostalZone by zip ${toZip}`, 422);
+      return void 0;
     }
 
     const zone = toPostalZone?.[fromPostalZone.proposal];
     if (!zone || zone === '-') {
-      return ReturnMsg(res, `No Avaliable Zone from ${fromPostalZone.proposal} to ${toPostalZone.proposal}`, 422);
+      ReturnMsg(res, `No Avaliable Zone from ${fromPostalZone.proposal} to ${toPostalZone.proposal}`, 422);
+      return void 0;
     }
 
-    return res.json({ zone });
+    res.json({ zone });
   } catch (error: any) {
-    return ReturnMsg(res, error.message );
+    ReturnMsg(res, error.message );
   }
 };

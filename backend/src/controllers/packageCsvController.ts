@@ -63,8 +63,8 @@ export const getCsvPackages = async (req: AuthRequest, res: ResponseAdv<GetPacka
     const csv = parse(packagesData, { fields: csvFieldsMapping });
     res.header('Content-Type', 'text/csv');
     res.header('Content-Disposition', `attachment; filename="packages_${uuidv4()}.csv"`);
-    return res.send(csv);
+    res.send(csv);
   } catch (error: any) {
-    return resHeaderError('getCsvPackages', error, req.query, res, next);
+    resHeaderError('getCsvPackages', error, req.query, res, next);
   }
 };

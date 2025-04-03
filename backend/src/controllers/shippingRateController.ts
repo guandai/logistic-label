@@ -68,9 +68,9 @@ export const getShippingRatesForWeight = async (weight: number, unit: string): P
 export const getShippingRates = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const rates = await ShippingRate.findAll();
-    return res.json(rates);
+    res.json(rates);
   } catch (error: any) {
-    return resHeaderError('getShippingRates', error, req.params, res, next);
+    resHeaderError('getShippingRates', error, req.params, res, next);
   }
 };
 
@@ -96,9 +96,9 @@ export const getFullRate = async (req: AuthRequest, res: Response, next: NextFun
     if (totalCost === 'NO_RATE') {
       throw new NotFoundError(`No shipping rate found for weight and zone ${weight} ${weightUnit}`)
     };
-    return res.json({ totalCost });
+    res.json({ totalCost });
   } catch (error: any) {
-    return resHeaderError('getFullRate', error, req.params, res, next);
+    resHeaderError('getFullRate', error, req.params, res, next);
   }
 };
 

@@ -35,9 +35,9 @@ export const getTransactions = async (req: AuthRequest, res: ResponseAdv<GetTran
       limit,
       offset,
     });
-    return res.json({ total, transactions });
+    res.json({ total, transactions });
   } catch (error: any) {
-    return resHeaderError('getTransactions', error, req.query, res, next);
+    resHeaderError('getTransactions', error, req.query, res, next);
   }
 };
 
@@ -52,8 +52,8 @@ export const getTransactionById = async (req: AuthRequest, res: ResponseAdv<GetT
     if (!transaction) {
       throw new NotFoundError(`Transaction not found - ${req.params.id}`);
     }
-    return res.json({transaction});
+    res.json({transaction});
   } catch (error: any) {
-    return resHeaderError('getTransactionById', error, req.params, res, next);
+    resHeaderError('getTransactionById', error, req.params, res, next);
   }
 }

@@ -13,9 +13,9 @@ export const getZipCode = async (req: AuthRequest, res: ResponseAdv<ZipCode>, ne
     if (!zipCode) {
       throw new NotFoundError(`Zip code not found - ${zip}`);
     }
-    return res.json(zipCode);
+    res.json(zipCode);
   } catch (error: any) {
-    return resHeaderError('getZipCode', error, req.params, res, next);
+    resHeaderError('getZipCode', error, req.params, res, next);
   }
 };
 

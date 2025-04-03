@@ -34,7 +34,7 @@ export const importPackages = async (req: AuthRequest, res: ResponseAdv<ImportPa
 			.on('end', async () => onEnd({ req, res, pkgGlobal, file }))
 			.on('error', (error: any) => onError( error, pkgGlobal ));
 	} catch (error: any) {
-		return resHeaderError('importPackages', error, req.file, res, next);
+		resHeaderError('importPackages', error, req.file, res, next);
 	}
 };
 

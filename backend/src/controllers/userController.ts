@@ -31,9 +31,9 @@ export const registerUser = async (req: Request, res: ResponseAdv<RegisterUserRe
     const user = await User.create({ name, email, password: hashedPassword, role });
     warehouseAddress.userId = user.id;
     await Address.createWithInfo(warehouseAddress);
-    return res.status(201).json({ success: true, userId: user.id });
+    res.status(201).json({ success: true, userId: user.id });
   } catch (error: any) {
-    return resHeaderError('registerUser', error, req.body, res, next);
+    resHeaderError('registerUser', error, req.body, res, next);
   }
 };
 
@@ -50,9 +50,9 @@ export const loginUser = async (req: AuthRequest, res: ResponseAdv<LoginUserRes>
     }
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: '7d' });
-    return res.json({ token, userId: user.id, userRole: user.role });
+    res.json({ token, userId: user.id, userRole: user.role });
   } catch (error: any) {
-    return resHeaderError('loginUser', error, req.body, res, next);
+    resHeaderError('loginUser', error, req.body, res, next);
   }
 };
 
@@ -69,9 +69,9 @@ export const updateUserById = async (req: AuthRequest, res: ResponseAdv<UpdateUs
     const [affectedCount]: [affectedCount: number] = await User.update(user, { where: { id: user.id } });
     const result: UpdateUserRes = { success: affectedCount > 0 };
 
-    return res.json(result);
+    res.json(result);
   } catch (error: any) {
-    return resHeaderError('updateUserById', error, req.body, res, next);
+    resHeaderError('updateUserById', error, req.body, res, next);
   }
 };
 
@@ -96,9 +96,9 @@ export const getUsers = async (req: AuthRequest, res: ResponseAdv<GetUsersRes>, 
     });
     const total = rows.count;
     const users = rows.rows;
-    return res.json({ users, total });
+    res.json({ users, total });
   } catch (error: any) {
-    return resHeaderError('getUsers', error, req.query, res, next);
+    resHeaderError('getUsers', error, req.query, res, next);
   }
 };
 
@@ -119,9 +119,9 @@ export const getUserById = async (req: AuthRequest, res: ResponseAdv<GetUserRes>
       throw new NotFoundError(`User not found - ${req.params.id}`);
     };
 
-    return res.json({ user });
+    res.json({ user });
   } catch (error: any) {
-    return resHeaderError('getUserById', error, req.params, res, next);
+    resHeaderError('getUserById', error, req.params, res, next);
   }
 };
 
@@ -136,8 +136,8 @@ export const deleteUserById = async (req: AuthRequest, res: ResponseAdv<SimpleRe
     await User.destroy({ where: { id: user.id } });
     await Transaction.destroy({ where: { userId: user.id } });
     await Package.destroy({ where: { userId: user.id } });
-    return res.json({ message: 'User deleted' });
+    res.json({ message: 'User deleted' });
   } catch (error: any) {
-    return resHeaderError('deleteUserById', error, req.params, res, next);
+    resHeaderError('deleteUserById', error, req.params, res, next);
   }
 }
