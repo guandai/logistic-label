@@ -65,6 +65,5 @@ export const getRelationQuery = (req: AuthRequest) => {
 	const whereTo = getAddressesWhere(req, AddressEnum.toPackage);
 	const whereFrom = getAddressesWhere(req, AddressEnum.fromPackage);
 	const include = getInclude(whereFrom, whereTo);
-	console.log(`include`, include);
 	return { where, include };
 };
