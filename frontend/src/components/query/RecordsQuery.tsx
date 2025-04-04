@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import { tryLoad } from '../../util/errors';
 
-import { GetRecordsReq, GetRecordsRes, isGetPackagesRes, isGetTransactionsRes, isGetUsersRes } from '@ddlabel/shared';
+import { AddressEnum, GetRecordsReq, GetRecordsRes, isGetPackagesRes, isGetTransactionsRes, isGetUsersRes } from '@ddlabel/shared';
 import { MessageContent, SearchOptions } from '../../types';
 import { toDateTime } from '../../util/time';
 import RecordsQuerySearch from './RecordsQuerySearch';
@@ -15,6 +15,7 @@ export type FilterConfig = {
 	endDate: Date | null;
 	trackingNo: string;
 	address: string;
+	addressType: AddressEnum;
 };
 type Props = {
 	searchList?: SearchOptions[];
@@ -35,10 +36,11 @@ const RecordsQuery: React.FC<Props> = (prop) => {
 	const [maxPage, setMaxPage] = useState(1);
 	const [trackingNo, setTrackingNo] = useState('');
 	const [address, setAddress] = useState('');
+	const [addressType, setAddressType] = useState(AddressEnum.toPackage);
 	const [email, setEmail] = useState('');
 
 	useEffect(() => {
-		setFilter && setFilter({ startDate, endDate, trackingNo, address });
+		setFilter && setFilter({ startDate, endDate, trackingNo, address, addressType });
 		const callback = async () => {
 			const params: GetRecordsReq = {
 				startDate: startDate ? toDateTime(startDate, false) : '',
@@ -46,10 +48,11 @@ const RecordsQuery: React.FC<Props> = (prop) => {
 				trackingNo,
 				email,
 				address,
+				addressType: AddressEnum.toPackage,
 				limit: perPage,
 				offset: (page - 1) * perPage
 			};
-			const recordsRes: GetRecordsRes = await getRecords(params);
+			const recordsRes: GetRecordsRes = await getRecords(params); //sent query
 
 			if (isGetPackagesRes(recordsRes)) {
 				setRecords(recordsRes.packages);

@@ -3,7 +3,7 @@ import {
   Table, TableBody, TableContainer, TableHead, TableRow,
   Paper, Typography
 } from '@mui/material';
-import { BeansAI, BeansStatus, PackageModel } from '@ddlabel/shared';
+import { AddressEnum, BeansAI, BeansStatus, PackageModel } from '@ddlabel/shared';
 import { tryLoad } from '../../util/errors';
 
 import MessageAlert from '../share/MessageAlert';
@@ -23,7 +23,7 @@ const PackageTable: React.FC = () => {
   const [packages, setPackages] = useState<PackageModel[]>([]);
   const [message, setMessage] = useState<MessageContent>(null);
   const [statusLogs, setStatusLogs] = useState<StatusLogsMaps >([]);
-  const [filter, setFilter] = useState<FilterConfig>({ startDate: null, endDate: null, trackingNo: '', address: '' });
+  const [filter, setFilter] = useState<FilterConfig>({ startDate: null, endDate: null, trackingNo: '', address: '', addressType: AddressEnum.toPackage });
 
   useEffect(() => {
     const callback = async () => {
@@ -62,7 +62,7 @@ const PackageTable: React.FC = () => {
             <TableBody>
               {packages.map((pkg) => (
                 <TableRow key={pkg.id}>
-                  <StyledTabelCell sx={{ margin: '0px' }} >{pkg.toAddress.address1}</StyledTabelCell>
+                  <StyledTabelCell sx={{ margin: '0px' }} >{pkg.toAddress?.address1}</StyledTabelCell>
                   <StyledTabelCell>{toDateTime(pkg.createdAt)}</StyledTabelCell>
                   <StyledTabelCell>
                   { !statusLogs[pkg.id] ? <LoadingSpinner/> : <StatusLabel status={toStatus(pkg.id)}> {toStatus(pkg.id)} </StatusLabel> }

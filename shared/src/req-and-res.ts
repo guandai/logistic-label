@@ -1,6 +1,6 @@
 // shared/src/req-and-res.ts
 import { Optional } from 'sequelize';
-import { AddressAttributes, AddressModel, PackageModel, PostalZoneAttributes, TransactionModel, UserAttributes, UserModel, UserRolesEnum } from "./models";
+import { AddressAttributes, AddressEnum, AddressModel, PackageModel, PostalZoneAttributes, TransactionModel, UserAttributes, UserModel, UserRolesEnum } from "./models";
 import { SimpleRes } from './types';
 import { BeansAI } from './beans';
 
@@ -66,6 +66,7 @@ export type SearchRecordReq = {
 	role?: UserRolesEnum;
 	name?: string;
 	address?: string;
+	addressType?: AddressEnum;
 };
 
 export type DateRecordReq = {

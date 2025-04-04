@@ -27,8 +27,12 @@ export const getQueryWhere = (req: AuthRequest): WhereOptions => {
 	return { ...whereTrackingNo, ...whereDate, ...whereEmail, ...whereName };
 };
 
-export const getAddressesWhere = (req: AuthRequest, addressType: AddressEnum): WhereOptions => {
+export const getAddressesWhere = (req: AuthRequest, addressType: AddressEnum): WhereOptions | null => {
 	const address = req.query.address as string;
+	if (req.query.addressType != addressType) {
+		// console.log(`!not match addressType:`, req.query.addressType, addressType);
+		return null;
+	}
 	const hasAddress = address && address.length >= 2;
 
 	const whereAddress = hasAddress ? {
@@ -41,18 +45,26 @@ export const getAddressesWhere = (req: AuthRequest, addressType: AddressEnum): W
 	return { ...whereAddress, addressType };
 };
 
-const getInclude = (whereFrom: WhereOptions, whereTo: WhereOptions) => [
-	{ model: Address, as: 'fromAddress', where: whereFrom, required: false },
-	{ model: Address, as: 'toAddress', where: whereTo, required: false },
-	// { model: User, as: 'user' },
-	// { model: Transaction, as: 'transaction' },
-];
+const getInclude = (whereFrom: WhereOptions | null, whereTo: WhereOptions | null) => {
+	const result = [
+		// { model: User, as: 'user' },
+		// { model: Transaction, as: 'transaction' },
+	]
+	if (whereFrom && Object.keys(whereFrom).length > 0) {
+		result.push({ model: Address, as: 'fromAddress', where: whereFrom, required: true })
+	}
+	if (whereTo && Object.keys(whereTo).length > 0) {
+		result.push({ model: Address, as: 'toAddress', where: whereTo, required: true })
+	}
+	return result;
+};
 
 export const getRelationQuery = (req: AuthRequest) => {
 	const whereQuery = getQueryWhere(req);
 	const where = { ...whereQuery, userId: req.user.id };
-	const whereFrom = getAddressesWhere(req, AddressEnum.fromPackage);
 	const whereTo = getAddressesWhere(req, AddressEnum.toPackage);
+	const whereFrom = getAddressesWhere(req, AddressEnum.fromPackage);
 	const include = getInclude(whereFrom, whereTo);
+	console.log(`include`, include);
 	return { where, include };
 };
