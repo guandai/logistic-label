@@ -82,6 +82,7 @@ const PackageForm: React.FC = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(null);
     setPackageData(prevData => ({ ...prevData, [e.target.name]: e.target.value }));
   };
 
