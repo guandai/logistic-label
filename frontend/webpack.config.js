@@ -7,6 +7,9 @@ module.exports = {
     path: path.resolve(__dirname, 'build'),
     publicPath: '/',
   },
+  optimization: {
+    splitChunks: false,
+  }
   mode: 'development', // Use 'production' for production builds
   devServer: {
     static: {
