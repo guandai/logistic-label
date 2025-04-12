@@ -1,0 +1,22 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.defineRelations = void 0;
+const Address_1 = require("../models/Address");
+const Package_1 = require("../models/Package");
+const Transaction_1 = require("../models/Transaction");
+const User_1 = require("../models/User");
+const defineRelations = () => {
+    User_1.User.hasOne(Address_1.Address, { as: 'warehouseAddress', foreignKey: 'userId', onDelete: 'CASCADE' });
+    Address_1.Address.belongsTo(User_1.User, { as: 'user', foreignKey: 'userId' });
+    User_1.User.hasMany(Package_1.Package, { as: 'packages', foreignKey: 'userId', onDelete: 'CASCADE' });
+    Package_1.Package.belongsTo(User_1.User, { as: 'user', foreignKey: 'userId' });
+    User_1.User.hasMany(Transaction_1.Transaction, { as: 'transactions', foreignKey: 'userId', onDelete: 'CASCADE' });
+    Transaction_1.Transaction.belongsTo(User_1.User, { as: 'user', foreignKey: 'userId' });
+    Package_1.Package.hasOne(Transaction_1.Transaction, { as: 'transaction', foreignKey: 'packageId', onDelete: 'CASCADE' });
+    Transaction_1.Transaction.belongsTo(Package_1.Package, { as: 'package', foreignKey: 'packageId' });
+    Package_1.Package.hasOne(Address_1.Address, { as: 'fromAddress', foreignKey: 'fromPackageId', onDelete: 'CASCADE' });
+    Address_1.Address.belongsTo(Package_1.Package, { as: 'fromPackage', foreignKey: 'fromPackageId' });
+    Package_1.Package.hasOne(Address_1.Address, { as: 'toAddress', foreignKey: 'toPackageId', onDelete: 'CASCADE' });
+    Address_1.Address.belongsTo(Package_1.Package, { as: 'toPackage', foreignKey: 'toPackageId' });
+};
+exports.defineRelations = defineRelations;

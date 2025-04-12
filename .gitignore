@@ -9,9 +9,9 @@ backend/uploads/
 
 
 #build files
-/backend/dist
-/shared/dist
-/frontend/dist
+// /backend/dist
+// /shared/dist
+// /frontend/dist
 
 
 # dependencies
