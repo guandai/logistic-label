@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/static/css/main.4efb37a3.css",
+    "main.js": "/static/js/main.13ce92f9.js",
+    "static/js/968.ed1fd4ac.chunk.js": "/static/js/968.ed1fd4ac.chunk.js",
+    "static/js/551.43d296ec.chunk.js": "/static/js/551.43d296ec.chunk.js",
+    "static/js/510.ea6af220.chunk.js": "/static/js/510.ea6af220.chunk.js",
+    "static/media/brand_logo.jpg": "/static/media/brand_logo.f5a4c9426d60be57a61c.jpg",
+    "static/media/brand_font.jpg": "/static/media/brand_font.d1e4aea5b7fc6ae5e2be.jpg",
+    "static/media/brand_logo.svg": "/static/media/brand_logo.bc3ee5ee26bccab42006bdbda41539b7.svg",
+    "index.html": "/index.html"
+  },
+  "entrypoints": [
+    "static/css/main.4efb37a3.css",
+    "static/js/main.13ce92f9.js"
+  ]
+}
