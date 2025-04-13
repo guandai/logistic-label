@@ -1,5 +1,5 @@
 server {
-    server_name label.daidk.com;
+    server_name label.twindai.com;
 
     root /git/ddlabel/;
     index index.html;
@@ -10,6 +10,7 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Origin $http_origin; # Forward the Origin header
 
         # Pass all response headers from the backend
         proxy_pass_header Content-Type;
@@ -30,21 +31,22 @@ server {
     }
 
     listen 443 ssl;
-    ssl_certificate /etc/letsencrypt/live/label.daidk.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/label.daidk.com/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    ssl_certificate /usr/local/etc/nginx/ssl/twindai.com.crt;
+    ssl_certificate_key /usr/local/etc/nginx/ssl/twindai.com.key;
+    include /usr/local/etc/nginx/conf.d/ssl.conf; # Use a separate file for SSL settings
+    ssl_dhparam /usr/local/etc/nginx/ssl/dhparam.pem; # Use a separate file for DH parameters
 
     client_max_body_size 20M;
 }
 
 server {
-    if ($host = label.daidk.com) {
+    if ($host = label.twindai.com) {
         return 301 https://$host$request_uri;
     }
 
     listen 80;
-    server_name label.daidk.com;
+    server_name label.twindai.com;
+    #include /usr/local/etc/nginx/conf.d/letsencrypt.conf; # Use a separate file for Let's Encrypt verification
 
     client_max_body_size 20M;
 
