@@ -1,10 +1,11 @@
 // frontend/src/external/beansApi.ts
 import axios from "axios";
 import { GetStatusLogRes, GetStatusLogReq, BeansAI } from "@ddlabel/shared";
+import { BEANS_API_KEY, BEANS_API_URL } from "../env_var";
 // https://isp.beans.ai/enterprise/v1/lists/itemsdocumentation/ky15d3jqrqf2dr49mgqgl?returnEmptyIfMissing=true
 export class BeansAiApi {
-	private path = `${process.env.REACT_APP_BEANS_API_URL}`;
-	private config = { headers: { Authorization: `${process.env.REACT_APP_BEANS_API_KEY}` } };
+	private path = BEANS_API_URL;
+	private config = { headers: { Authorization: `${BEANS_API_KEY}` } };
 	public async getStatusLog(req: GetStatusLogReq) {
 		const params = {
 			tracking_id: req.trackingNo,

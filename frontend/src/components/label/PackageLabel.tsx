@@ -2,11 +2,13 @@ import React from 'react';
 import QRCode from 'qrcode.react';
 import BarcodeComponent from './BarcodeComponent';
 import { Box, Typography } from '@mui/material';
+import ErrorBoundary from '../share/ErrorBoundary';
 import { cleanAddress, getStateId, PackageModel } from '@ddlabel/shared';
-import brandLogo from '../../assets/jpg/brand_logo.jpg'; // Import the main logo
-import brandFont from '../../assets/jpg/brand_font.jpg'; // Import the bottom-right logo
+import brandLogo from '../../assets/png/brand_logo.png'; // Import the main logo
+import brandFont from '../../assets/png/brand_font.png'; // Import the bottom-right logo
 import styled from 'styled-components';
 import { scaleStyle } from '../../util/styled';
+import { FE_URL } from '../../env_var';
 
 type MonoSmallProp = {
   factor: number;
@@ -35,6 +37,7 @@ export const PackageLabel: React.FC<PackageLabelProps> = (prop) => {
   const scaledWidth = scaleStyle(width || '4in', factor);
   const scaledHeight = scaleStyle(height || '6in', factor);
   return (
+    <ErrorBoundary fallback={<p>Something went wrong</p>}>
     <Box sx={{
       width: `calc(${scaledWidth} - ${0.02 * factor}in * 2)`,  // Adjusted width to account for border on both sides
       height: `calc(${scaledHeight} - ${0.02 * factor}in * 2)`, // Adjusted height to account for border on top and bottom
@@ -50,34 +53,34 @@ export const PackageLabel: React.FC<PackageLabelProps> = (prop) => {
           {/* logo part */}
           <Box>
             <img src={brandLogo} alt="Brand Logo" style={{ display: 'inline', width: `${0.7 * factor}in`}} />
-            <Typography variant="h4" sx={{ fontSize: `${2 * factor }rem`, float: 'right', display: 'inline', fontWeight: 'bold' }}>{pkg.toAddress.sortCode}</Typography>
+            <Typography variant="h4" sx={{ fontSize: `${2 * factor }rem`, float: 'right', display: 'inline', fontWeight: 'bold' }}>{pkg.toAddress?.sortCode}</Typography>
           </Box>
 
           {/* Return to part */}
           <Box sx={{ height: `${1.05 * factor}in`, textAlign: 'left' }}>
             <MonoTypoSmall factor={factor} variant='body1'>Return to:</MonoTypoSmall>
-            <MonoTypoSmall factor={factor} >{pkg.fromAddress.name}</MonoTypoSmall>
-            <MonoTypoSmall factor={factor} >{cleanAddress(pkg, 'from', pkg.fromAddress.address1)}</MonoTypoSmall>
-            <MonoTypoSmall factor={factor} >{cleanAddress(pkg, 'from', pkg.fromAddress.address2)}</MonoTypoSmall>
-            <MonoTypoSmall factor={factor} >{pkg.fromAddress.city}, {getStateId(pkg.fromAddress.state)}, {pkg.fromAddress.zip}</MonoTypoSmall>
+            <MonoTypoSmall factor={factor} >{pkg.fromAddress?.name}</MonoTypoSmall>
+            <MonoTypoSmall factor={factor} >{cleanAddress(pkg, 'from', pkg.fromAddress?.address1)}</MonoTypoSmall>
+            <MonoTypoSmall factor={factor} >{cleanAddress(pkg, 'from', pkg.fromAddress?.address2)}</MonoTypoSmall>
+            <MonoTypoSmall factor={factor} >{pkg.fromAddress?.city}, {getStateId(pkg.fromAddress?.state)}, {pkg.fromAddress?.zip}</MonoTypoSmall>
           </Box>
         </Box>
 
         {/* top right part */}
         <Box sx={{ textAlign: 'right', width: '30%' }}>
-          <QRCode value={`${process.env.REACT_APP_FE_URL}/packages/${pkg.id}`} size={100 * factor} /> {/* Increase QR code size */}
-          <Typography sx={{ textAlign: 'center', fontSize: `${3 * factor}rem`, fontWeight: 'bold', lineHeight: 1 }}>{pkg.toAddress.proposal}</Typography>
-          <Typography sx={{ textAlign: 'center', fontSize: `${2 * factor}rem`, color: 'white', backgroundColor: 'black', lineHeight: 1 }}>{pkg.toAddress.zip}</Typography>
+          <QRCode value={`${FE_URL}/packages/${pkg.id}`} size={100 * factor} /> {/* Increase QR code size */}
+          <Typography sx={{ textAlign: 'center', fontSize: `${3 * factor}rem`, fontWeight: 'bold', lineHeight: 1 }}>{pkg.toAddress?.proposal}</Typography>
+          <Typography sx={{ textAlign: 'center', fontSize: `${2 * factor}rem`, color: 'white', backgroundColor: 'black', lineHeight: 1 }}>{pkg.toAddress?.zip}</Typography>
         </Box>
       </Box>
 
       {/* Ship to part */}
       <Box mt={1} sx={{ height: `${1.15 * factor}in`, borderTop: 'solid' }}>
         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>SHIP TO:</Typography>
-        <MonoTypoNormal factor={factor} >{pkg.toAddress.name}</MonoTypoNormal>
-        <MonoTypoNormal factor={factor} >{cleanAddress(pkg,'to', pkg.toAddress.address1)}</MonoTypoNormal>
-        <MonoTypoNormal factor={factor} >{cleanAddress(pkg, 'to', pkg.toAddress.address2)}</MonoTypoNormal>
-        <MonoTypoNormal factor={factor} >{pkg.toAddress.city}, {getStateId(pkg.toAddress.state)}, {pkg.toAddress.zip}</MonoTypoNormal>
+        <MonoTypoNormal factor={factor} >{pkg.toAddress?.name}</MonoTypoNormal>
+        <MonoTypoNormal factor={factor} >{cleanAddress(pkg,'to', pkg.toAddress?.address1)}</MonoTypoNormal>
+        <MonoTypoNormal factor={factor} >{cleanAddress(pkg, 'to', pkg.toAddress?.address2)}</MonoTypoNormal>
+        <MonoTypoNormal factor={factor} >{pkg.toAddress?.city}, {getStateId(pkg.toAddress?.state)}, {pkg.toAddress?.zip}</MonoTypoNormal>
       </Box>
 
       {/* lbs weight number */}
@@ -104,6 +107,7 @@ export const PackageLabel: React.FC<PackageLabelProps> = (prop) => {
         <img src={brandFont} alt="Brand Font Logo" style={{ width: `${8 * factor}em` }} />
       </Box>
     </Box>
+    </ErrorBoundary>
   );
 };
 

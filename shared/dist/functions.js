@@ -65,7 +65,7 @@ var statesAbbreviations = {
     "wyoming": "WY"
 };
 var getStateId = function (state) {
-    return statesAbbreviations[state.toLowerCase()];
+    return statesAbbreviations[state?.toLowerCase()];
 };
 exports.getStateId = getStateId;
 var cleanAddress = function (pkg, dest, addressString) {

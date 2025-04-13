@@ -9,8 +9,9 @@ import { io } from 'socket.io-client';
 import { SetMessage } from '../../util/errors';
 import { HeaderMapping } from '@ddlabel/shared';
 import { PackageApi } from '../../api/PackageApi';
+import { SOCKET_IO_HOST } from '../../env_var';
 
-const socket = io(`${process.env.REACT_APP_SOCKET_IO_HOST}`, { path: '/api/socket.io' });
+const socket = io(`${SOCKET_IO_HOST}`, { path: '/api/socket.io' });
 
 export enum RunStatus {
   'ready' , 'running' , 'done'

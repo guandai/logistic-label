@@ -9,7 +9,7 @@ module.exports = {
   },
   optimization: {
     splitChunks: false,
-  }
+  },
   mode: 'development', // Use 'production' for production builds
   devServer: {
     static: {

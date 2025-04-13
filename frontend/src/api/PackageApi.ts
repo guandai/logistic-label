@@ -1,9 +1,10 @@
 import { GetPackageRes, CreatePackageReq, CreatePackageRes, GetPackagesReq, GetPackagesRes, ImportPackageReq, ImportPackageRes, UpdatePackageReq, UpdatePackageRes, GetPackagesCsvRes, GetPackagesCsvReq } from "@ddlabel/shared";
 import axios, { AxiosProgressEvent } from "axios";
+import { BE_URL } from "../env_var";
 
 export class PackageApi {
 	private config = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
-	private path = `${process.env.REACT_APP_BE_URL}/packages`;
+	private path = `${BE_URL}/packages`;
 	getPackages = async(params? : GetPackagesReq ) => (await axios.get<GetPackagesRes>(`${this.path}`, {...this.config, params})).data
 	getPackageById = async(id: string) => (await axios.get<GetPackageRes>(`${this.path}/${id}`, this.config)).data
 	createPackage = async(payload: CreatePackageReq) => (await axios.post<CreatePackageRes>(`${this.path}`, payload, this.config)).data
