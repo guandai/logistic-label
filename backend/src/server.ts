@@ -37,7 +37,7 @@ const io = new Server(server, {
   path: '/api/socket.io/',
   cors: {
     origin: '*',
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'socket-id'],
     credentials: true,
   },

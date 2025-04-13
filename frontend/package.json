@@ -30,10 +30,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "prod": "npx pm2 start npx --name 'frontend' -- serve -s build -l 3000",
+    "prod": "npx pm2 start npx --name 'frontend' -- serve -s dist -l 3000",
     "serve": "npx serve -s dist -l 3000 &",
     "start": "REACT_APP_LOCAL_BACKEND=true react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false BUILD_PATH=dist react-scripts build",
+    "build": "GENERATE_SOURCEMAP=false BUILD_PATH=dist react-scripts build && bash ./generate-config.sh",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
