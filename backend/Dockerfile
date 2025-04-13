@@ -1,41 +1,19 @@
-# Backend Dockerfile
-FROM node:18-alpine AS builder
+# filepath: backend/Dockerfile
+FROM node:18-alpine
 
-# Enable Corepack to manage Yarn versions
+# Enable Corepack
+RUN npm install -g corepack
 RUN corepack enable
 
-# Set working directory
 WORKDIR /app
 
 # Copy package.json and yarn.lock
-COPY ../../package.json ../../yarn.lock ./
-COPY ./package.json ./yarn.lock ./
+COPY package.json yarn.lock ./
 
-# Install the correct Yarn version specified in package.json
+# Set the Yarn version
 RUN corepack prepare yarn@4.8.1 --activate
 
 # Install dependencies
-RUN yarn install --production --frozen-lockfile
+RUN yarn install --frozen-lockfile
 
-# Copy the backend source code
-COPY . .
-
-# Build the backend
-RUN yarn workspace @ddlabel/backend build
-
-# Production image
-FROM node:18-alpine
-
-# Set working directory
-WORKDIR /app
-
-# Copy built files and dependencies
-COPY --from=builder /app/backend/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY ./package.json ./
-
-# Expose backend port
-EXPOSE 5100
-
-# Start the backend
-CMD ["node", "dist/server.js"]
+CMD ["node", "-v"]
