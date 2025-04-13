@@ -32,11 +32,11 @@ const sequelize = new Sequelize({
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    logger.info('Connection has been established successfully.');
+    console.info('Connection has been established successfully.');
     // sequelize.sync();
-    logger.info('Database synchronized successfully.');
+    console.info('Database synchronized successfully.');
   } catch (error) {
-    logger.error('Unable to connect to the database:', error);
+    console.error('Unable to connect to the database:', error);
   }
 };
 

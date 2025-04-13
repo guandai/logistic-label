@@ -15,7 +15,9 @@ RUN yarn install
 RUN yarn install --immutable --immutable-cache
 
 # Build the backend workspace.
+RUN yarn workspace @ddlabel/shared build
 RUN yarn workspace @ddlabel/backend build
+RUN yarn workspace @ddlabel/frontend build
 
 
 
