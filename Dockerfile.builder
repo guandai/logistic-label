@@ -14,6 +14,7 @@ COPY . .
 RUN yarn install
 RUN yarn install --immutable --immutable-cache
 
+ENV REACT_APP_RUNTIME_CONFIG=true
 # Build the backend workspace.
 RUN yarn workspace @ddlabel/shared build
 RUN yarn workspace @ddlabel/backend build
