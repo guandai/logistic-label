@@ -2,8 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { TextField, Grid, Typography } from '@mui/material';
 import { SetMessage, tryLoad } from '../../util/errors';
-import { AddressAttributes, extractAddressZip } from '@ddlabel/shared';
+import { AddressAttributes } from '@ddlabel/shared';
 import { ZipCodeApi } from '../../api/ZipCodeApi';
+import { extractAddressZip } from '../../util/functions';
 
 type QuickFieldProps = {
   name: keyof AddressAttributes;

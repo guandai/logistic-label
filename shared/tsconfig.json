@@ -5,8 +5,9 @@
 	  "declaration": true,
 	  "outDir": "dist",
 	  "rootDir": "src",
+		"sourceMap": true,
 	  "strict": true
 	},
-	"include": ["src", "../frontend/src/util/functions.ts"],
+	"include": ["src"],
 	"exclude": ["node_modules", "dist"]
   }

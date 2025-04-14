@@ -36,8 +36,8 @@ const RecordsQuery: React.FC<Props> = (prop) => {
 	const [maxPage, setMaxPage] = useState(1);
 	const [trackingNo, setTrackingNo] = useState('');
 	const [address, setAddress] = useState('');
-	const [addressType, setAddressType] = useState(AddressEnum.toPackage);
 	const [email, setEmail] = useState('');
+	const addressType = AddressEnum.toPackage;
 
 	useEffect(() => {
 		setFilter && setFilter({ startDate, endDate, trackingNo, address, addressType });
@@ -65,7 +65,7 @@ const RecordsQuery: React.FC<Props> = (prop) => {
 			setTotal(recordsRes.total);
 		}
 		tryLoad(setMessage, callback);
-	}, [address, email, endDate, page, perPage, startDate, trackingNo, getRecords, setRecords, setMessage, setFilter]);
+	}, [addressType, address, email, endDate, page, perPage, startDate, trackingNo, getRecords, setRecords, setMessage, setFilter]);
 
 	return (
 		<Box width='100%' sx={{ mt: 2 }}>

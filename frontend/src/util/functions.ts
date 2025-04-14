@@ -64,11 +64,10 @@ const statesAbbreviations = {
 	"wyoming": "WY"
 };
 
-export const getStateId = (state: string): string => 
-	{
+export const getStateId = (state: string): string => {
 		if (!state) { return ''; }
 		return statesAbbreviations[state?.toLowerCase() as keyof typeof statesAbbreviations];
-  }
+}
 
 export const cleanAddress = (pkg: PackageModel, dest: 'to' | 'from',  addressString?: string) => {
 	const addressObj = dest === 'to' ? pkg.toAddress : pkg.fromAddress;

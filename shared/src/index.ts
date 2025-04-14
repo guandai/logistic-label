@@ -1,6 +1,5 @@
 export * from './models'
 export * from './req-and-res'
 export * from './types'
-export * from '../../frontend/src/util/functions'
 export * from './constants'
 export * from './beans'
