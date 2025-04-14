@@ -1,4 +1,4 @@
-import { PackageModel } from "./models";
+import { PackageModel } from "@ddlabel/shared/src/models";
 
 export const extractAddressZip = (address?: string): string => {
 	const zip = address?.trim().match(/\b\d{5}\b/);
@@ -65,7 +65,10 @@ const statesAbbreviations = {
 };
 
 export const getStateId = (state: string): string => 
-	statesAbbreviations[state.toLowerCase() as keyof typeof statesAbbreviations];
+	{
+		if (!state) { return ''; }
+		return statesAbbreviations[state?.toLowerCase() as keyof typeof statesAbbreviations];
+  }
 
 export const cleanAddress = (pkg: PackageModel, dest: 'to' | 'from',  addressString?: string) => {
 	const addressObj = dest === 'to' ? pkg.toAddress : pkg.fromAddress;

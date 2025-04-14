@@ -6,12 +6,8 @@ services:
       context: ../
       dockerfile: backend/Dockerfile
     container_name: backend_service
-    environment:
-      NODE_ENV: production
-      DB_HOST: db
-      DB_USER: logistics_user
-      DB_PASS: logistics_password
-      DB_NAME: logistics_db
+    env_file:
+      - ../backend/.env.production  # Specify the path to your .env file
     ports:
       - "5100:5100"
     depends_on:
@@ -22,23 +18,17 @@ services:
       context: ../
       dockerfile: frontend/Dockerfile
     container_name: frontend_service
-    environment:
-      REACT_APP_BACKEND_URL: http://localhost:5100
+    env_file:
+      - ../frontend/.env.production # Specify the path to your .env file
     ports:
       - "3000:3000"
 
   db:
     image: mysql:8.0
     container_name: mysql_db
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: logistics_db
-      MYSQL_USER: logistics_user
-      MYSQL_PASSWORD: logistics_password
+    env_file:
+      - ../backend/.env.production  # Specify the path to your .env file
     ports:
       - "3306:3306"
     volumes:
-      - db_data:/var/lib/mysql
-
-volumes:
-  db_data:
+      - /usr/local/var/mysql/:/var/lib/mysql

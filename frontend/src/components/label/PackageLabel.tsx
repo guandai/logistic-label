@@ -3,12 +3,13 @@ import QRCode from 'qrcode.react';
 import BarcodeComponent from './BarcodeComponent';
 import { Box, Typography } from '@mui/material';
 import ErrorBoundary from '../share/ErrorBoundary';
-import { cleanAddress, getStateId, PackageModel } from '@ddlabel/shared';
 import brandLogo from '../../assets/png/brand_logo.png'; // Import the main logo
 import brandFont from '../../assets/png/brand_font.png'; // Import the bottom-right logo
 import styled from 'styled-components';
 import { scaleStyle } from '../../util/styled';
 import { FE_URL } from '../../env_var';
+import { cleanAddress, getStateId } from '../../util/functions';
+import { PackageModel } from '@ddlabel/shared';
 
 type MonoSmallProp = {
   factor: number;

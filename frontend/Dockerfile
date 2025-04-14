@@ -1,30 +1,28 @@
-# Frontend Dockerfile
-FROM node:18-alpine AS builder
+# === Production Stage ===
+FROM node:18-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and yarn.lock
-COPY ../../package.json ../../yarn.lock ./
-COPY ./package.json ./yarn.lock ./
+RUN npm install -g corepack && \
+    corepack enable && \
+    corepack prepare yarn@4.8.1 --activate
 
-# Install dependencies
-RUN yarn install --production --frozen-lockfile
+# Copy the built frontend output and runtime dependencies.
+# Adjust the paths if your build places files elsewhere.
+COPY --from=ddlabel-builder /app/frontend/dist ./frontend/dist
+COPY --from=ddlabel-builder /app/node_modules ./node_modules
+COPY --from=ddlabel-builder /app/frontend/package.json ./frontend/package.json
 
-# Copy the frontend source code
-COPY . .
+COPY --from=ddlabel-builder /app/shared ./shared
+COPY package.json ./
+RUN mkdir -p /app/uploads /app/download
+ENV NODE_PATH=/app/shared/dist
+EXPOSE 5100
 
-# Build the frontend
-RUN yarn workspace @ddlabel/frontend build
+WORKDIR /app/frontend
+RUN yarn install
+RUN yarn install --frozen-lockfile
 
-# Production image
-FROM nginx:alpine
-
-# Copy built frontend files to Nginx
-COPY --from=builder /app/frontend/dist /usr/share/nginx/html
-
-# Expose frontend port
-EXPOSE 3000
-
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the frontend application.
+# CMD ["sleep", "infinity"]
+CMD ["yarn", "serve"]

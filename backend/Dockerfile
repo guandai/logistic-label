@@ -1,25 +1,3 @@
-# === Builder Stage ===
-FROM node:18-alpine AS builder
-# Enable Corepack and prepare Yarn 4.8.1
-RUN npm install -g corepack && \
-    corepack enable && \
-    corepack prepare yarn@4.8.1 --activate
-WORKDIR /app
-# Copy the root package files and lockfile.
-# This assumes you're building from the project root as context.
-COPY package.json yarn.lock ./
-# Copy the entire project so that all workspaces are available.
-COPY . .
-# Install dependencies immutably (using the root yarn.lock).
-RUN yarn install
-RUN yarn install --immutable --immutable-cache
-
-# Build the backend workspace.
-RUN yarn workspace @ddlabel/backend build
-
-
-
-
 # === Production Stage ===
 FROM node:18-alpine
 
@@ -31,15 +9,17 @@ RUN npm install -g corepack && \
 
 # Copy the built backend output and runtime dependencies.
 # Adjust the paths if your build places files elsewhere.
-COPY --from=builder /app/backend/dist ./backend/dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/backend/package.json ./backend/package.json
+COPY --from=ddlabel-builder /app/backend/dist ./backend/dist
+COPY --from=ddlabel-builder /app/node_modules ./node_modules
+COPY --from=ddlabel-builder /app/backend/package.json ./backend/package.json
+
+COPY --from=ddlabel-builder /app/shared ./shared
 
 RUN mkdir -p /app/uploads /app/download
-# Optionally, copy the built shared package if needed.
-# This assumes your shared build outputs to /app/shared/dist.
-# (Optional) Use NODE_PATH so that require('@ddlabel/shared') resolves to the built module.
-# Expose the port which your backend uses (e.g., 5100)
+ENV NODE_PATH=/app/shared/dist
 EXPOSE 5100
+
+WORKDIR /app/backend
 # Start the backend application.
-CMD ["yarn", "entry"]
+# CMD ["sleep", "infinity"]
+CMD ["node", "dist/server.js"]

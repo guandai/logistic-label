@@ -7,6 +7,6 @@
 	  "rootDir": "src",
 	  "strict": true
 	},
-	"include": ["src"],
+	"include": ["src", "../frontend/src/util/functions.ts"],
 	"exclude": ["node_modules", "dist"]
   }

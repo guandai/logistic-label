@@ -19,29 +19,4 @@ RUN yarn workspace @ddlabel/shared build
 RUN yarn workspace @ddlabel/backend build
 RUN yarn workspace @ddlabel/frontend build
 
-
-
-
-# === Production Stage ===
-FROM node:18-alpine
-
-WORKDIR /app
-
-RUN npm install -g corepack && \
-    corepack enable && \
-    corepack prepare yarn@4.8.1 --activate
-
-# Copy the built backend output and runtime dependencies.
-# Adjust the paths if your build places files elsewhere.
-COPY --from=builder /app/backend/dist ./backend/dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/backend/package.json ./backend/package.json
-
-RUN mkdir -p /app/uploads /app/download
-# Optionally, copy the built shared package if needed.
-# This assumes your shared build outputs to /app/shared/dist.
-# (Optional) Use NODE_PATH so that require('@ddlabel/shared') resolves to the built module.
-# Expose the port which your backend uses (e.g., 5100)
-EXPOSE 5100
-# Start the backend application.
-CMD ["yarn", "entry"]
+CMD ["sleep", "infinity"]
