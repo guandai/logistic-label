@@ -7,7 +7,6 @@ import BeansTableSideBar from './BeansTableSideBar';
 import MessageAlert from '../share/MessageAlert';
 import BeansApi from '../../external/beansApi';
 import { toDateTime } from '../../util/time';
-import ModelActions from '../share/ModelActions';
 import { tryLoad } from '../../util/errors';
 import { BeansAI, Models } from '@ddlabel/shared';
 import BeansRoutesActions from './BeansRoutesActions';

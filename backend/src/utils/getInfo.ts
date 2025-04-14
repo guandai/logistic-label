@@ -1,4 +1,4 @@
-import { AddressChange, CsvRecord, extractAddressZip, PortInfo, ZipInfo } from '@ddlabel/shared';
+import { AddressChange, CsvRecord, PortInfo, ZipInfo } from '@ddlabel/shared';
 import stateDataJson from '../data/stateSmall.json';
 import portDataJson from '../data/portSmall.json';
 const stateData = stateDataJson as ZipInfo[];
@@ -18,6 +18,11 @@ type StateData = {
   state: string;
   county?: string;
   tz?: string;
+}
+
+export const extractAddressZip = (address?: string): string => {
+	const zip = address?.trim().match(/\b\d{5}\b/);
+	return zip ? zip[0] : '';
 }
 
 export const fixCityState = <T extends AddressChange>(attr: T): T => {
