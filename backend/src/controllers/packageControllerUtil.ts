@@ -2,9 +2,7 @@ import { AddressEnum } from "@ddlabel/shared";
 import { AuthRequest } from '../types';
 import { Op, WhereOptions } from "sequelize";
 import { isDateValid } from "../utils/errors";
-import { Transaction } from "../models/Transaction";
 import { Address } from "../models/Address";
-import { User } from "../models/User";
 
 export const getQueryWhere = (req: AuthRequest): WhereOptions => {
 	const startDate = req.query.startDate as string;
@@ -29,10 +27,6 @@ export const getQueryWhere = (req: AuthRequest): WhereOptions => {
 
 export const getAddressesWhere = (req: AuthRequest, addressType: AddressEnum): WhereOptions | null => {
 	const address = req.query.address as string;
-	if (req.query.addressType != addressType) {
-		// console.log(`!not match addressType:`, req.query.addressType, addressType);
-		return null;
-	}
 	const hasAddress = address && address.length >= 2;
 
 	const whereAddress = hasAddress ? {

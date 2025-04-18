@@ -73,7 +73,8 @@ connectDB().then(() => {
 });
 
 io.on('connection', (socket) => {
-  logger.info(`User connected from origin: ${socket.handshake.headers.origin}`);
+  logger.info(`User connected from referer: ${JSON.stringify(socket.handshake.headers.referer)}`);
+  logger.info(`User connected from x-real-ip: ${socket.handshake.headers['x-real-ip']}`);
   socket.on('disconnect', () => {
     logger.info('User disconnected');
   });

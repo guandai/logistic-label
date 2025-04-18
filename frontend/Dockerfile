@@ -12,7 +12,6 @@ RUN npm install -g corepack && \
 COPY --from=ddlabel-builder /app/frontend/dist ./frontend/dist
 COPY --from=ddlabel-builder /app/node_modules ./node_modules
 COPY --from=ddlabel-builder /app/frontend/package.json ./frontend/package.json
-
 COPY --from=ddlabel-builder /app/shared ./shared
 COPY package.json ./
 RUN mkdir -p /app/uploads /app/download

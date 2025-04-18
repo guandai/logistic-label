@@ -17,6 +17,8 @@ services:
     build:
       context: ../
       dockerfile: frontend/Dockerfile
+      # Remove the following line if you don't want to use a specific tag for your Docker image
+      # image: my-frontend-image:latest
     container_name: frontend_service
     env_file:
       - ../frontend/.env.production # Specify the path to your .env file
