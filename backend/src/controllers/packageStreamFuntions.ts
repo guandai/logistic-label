@@ -87,6 +87,7 @@ const finishProcessing = (params: FinishEndParams) => {
 	const { res, pkgGlobal, file } = params;
 	deleteUploadedFile(file);
 	if (pkgGlobal.errorMap.length > 0 || Object.keys(pkgGlobal.errorHash).length > 0) {
+		console.log(`pkgGlobal.errorMap`, pkgGlobal.errorMap);
 		const messageMaps = pkgGlobal.errorMap.map(e => e.message).join(',\n ');
 		const messagehash = Object.entries(pkgGlobal.errorHash).map(([key, count]) => formatErrorForFe(key, count)).join('\n ');
 		return res.status(400).json({ errors: pkgGlobal.errorMap, message: `Importing Done with error: \n${messageMaps}${messagehash}` });

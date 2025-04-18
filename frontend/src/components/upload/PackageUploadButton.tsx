@@ -5,13 +5,19 @@ import {
    LinearProgress
 } from '@mui/material';
 import { Upload } from '@mui/icons-material';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { SetMessage } from '../../util/errors';
 import { HeaderMapping } from '@ddlabel/shared';
 import { PackageApi } from '../../api/PackageApi';
 import { SOCKET_IO_HOST } from '../../env_var';
 
-const socket = io(`${SOCKET_IO_HOST}`, { path: '/api/socket.io' });
+
+// // Extend the Window interface to include the 'socket' property
+// declare global {
+//   interface Window {
+//     socket: Socket;
+//   }
+// }
 
 export enum RunStatus {
   'ready' , 'running' , 'done'
@@ -27,6 +33,9 @@ type Prop = {
   csvLength: number;
 };
 
+// need to set to false at beginning
+const socket = io(`${SOCKET_IO_HOST}`, { path: '/api/socket.io', autoConnect: false });
+
 export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
   const { runStatus, setRunStatus, setMessage, headerMapping, uploadFile, validateForm, csvLength } = prop;
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -37,6 +46,12 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
   const setUploadSuccess = (text: string) => setMessage({ text, level: 'success' });
 
   useEffect(() => {
+    socket.on('connect', () => {
+      const socketId = socket.id;
+      socket.emit('register', { socketId });
+      console.log(`socket connected`);
+    });
+    
     socket.on('insert', (data: { processed: number; total: number }) => {
       const progressPercentage = Math.round((data.processed / data.total) * 100);
       setInsertProgress(progressPercentage);
@@ -47,11 +62,15 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
       setGenerateProgress(progressPercentage);
     });
 
+    if (!socket.connected) {
+      socket.connect();
+    }
+    
     return () => {
       socket.off('generate');
       socket.off('insert');
     };
-  }, []);
+  }, [socket]);
 
   const onUploadProgress = (progressEvent: AxiosProgressEvent) => {
     const total = progressEvent.total;
@@ -64,7 +83,7 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
       setUploadInfo('Upload Done. preparing data...');
     }
   };
-
+  
   const handleFileUpload = async (e: any) => {
     if (validateForm && !validateForm()) {
       return;

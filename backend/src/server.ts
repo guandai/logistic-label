@@ -38,9 +38,9 @@ const io = new Server(server, {
   cors: {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'socket-id'],
-    credentials: true,
-  },
+    allowedHeaders: '*',
+    credentials: true 
+  }
 });
 
 const socketIoMiddleware = (req: Request, _res: Response, next: NextFunction) => {
