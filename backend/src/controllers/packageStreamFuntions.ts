@@ -68,8 +68,9 @@ export const onData = async ({ req, csvData, pkgGlobal }: OnDataParams) => {
 	const { packageCsvMap, packageCsvLength } = req.body;
 	pkgGlobal.processed ++;
 	const prepared = await getPreparedData(packageCsvMap, csvData);
+
 	if ('csvUploadError' in prepared) {
-		console.log(`prepared.csvUploadError.name`, prepared.csvUploadError.name);
+		console.log(`csvUploadError`, prepared.csvUploadError);
 		ternaryPutError(prepared.csvUploadError.name, pkgGlobal, prepared.csvUploadError);	
 	} else {
 		pkgGlobalPush(req, pkgGlobal, prepared);
@@ -86,11 +87,12 @@ const formatErrorForFe = (key: string, count: number) => `${count} resource(s) $
 const finishProcessing = (params: FinishEndParams) => {
 	const { res, pkgGlobal, file } = params;
 	deleteUploadedFile(file);
-	if (pkgGlobal.errorMap.length > 0 || Object.keys(pkgGlobal.errorHash).length > 0) {
-		console.log(`pkgGlobal.errorMap`, pkgGlobal.errorMap);
+	if (pkgGlobal.errorMap.length > 0 || Object.values(pkgGlobal.errorHash).some(x => x > 0)) {
 		const messageMaps = pkgGlobal.errorMap.map(e => e.message).join(',\n ');
 		const messagehash = Object.entries(pkgGlobal.errorHash).map(([key, count]) => formatErrorForFe(key, count)).join('\n ');
-		return res.status(400).json({ errors: pkgGlobal.errorMap, message: `Importing Done with error: \n${messageMaps}${messagehash}` });
+		return res.status(400).json({ 
+			errors: pkgGlobal.errorMap, 
+			message: `Importing Done with error: \n${messageMaps}${messagehash}` });
 	}
 	res.json({ message: `Importing Done!` });
 	// resHeaderError('getUsers', error, req.query, res, next);

@@ -108,11 +108,13 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
     } catch (error: any) {
       const err = error?.constructor.name === 'AxiosError' ? error?.response?.data?.message : error?.message;
       setUploadError(err || 'Failed to import packages.');
+      setRunStatus(RunStatus.done);
     }
   };
 
   // Calculate the buffer value based on some logic or placeholder value
   const valueBuffer = insertProgress !== null ? Math.min(insertProgress + 20, 100) : 0;
+  
   return (
   <>
     {runStatus === RunStatus.ready && <Button variant="contained" color="secondary" startIcon={<Upload />} component="label" >

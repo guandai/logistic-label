@@ -15,17 +15,25 @@ export const isValidJSON = (str: string) => {
 		return false;
 	}
 }
-export const ternaryPutError = (name: string, pkgGlobal: BatchDataType , error: ErrorRes) => (name in pkgGlobal.errorHash) ? pkgGlobal.errorHash[name] ++ : pkgGlobal.errorMap.push(error);
-export const toCamelCase = (str: string): string => 
+export const ternaryPutError = (
+	name: string, 
+	pkgGlobal: BatchDataType, 
+	error: ErrorRes
+) =>
+	(name in pkgGlobal.errorHash)
+		? pkgGlobal.errorHash[name]++
+		: pkgGlobal.errorMap.push(error);
+
+export const toCamelCase = (str: string): string =>
 	str.split(/[\s-_]+/)  // Split by spaces, dashes, or underscores
-	.map((word, index) => {
-		if (index === 0) {
-			return word.toLowerCase();  // First word should be all lowercase
-		}
-		return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();  // Capitalize the first letter of the rest
-	})
-	.join('');  // Join all the words without spaces
-	
+		.map((word, index) => {
+			if (index === 0) {
+				return word.toLowerCase();  // First word should be all lowercase
+			}
+			return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();  // Capitalize the first letter of the rest
+		})
+		.join('');  // Join all the words without spaces
+
 export const reducedConstraintError = (error: UniqueConstraintError) => {
 	const stacks = error.stack?.split('\n')
 	const lastFn = stacks?.pop()?.split(' ')[5] || '';
@@ -35,7 +43,7 @@ export const reducedConstraintError = (error: UniqueConstraintError) => {
 		original: error,
 		lastFn: lastFn,
 	});
-	
+
 	return aggregateError(batchError);
 }
 
@@ -47,7 +55,7 @@ export const isDateValid = (date: string) => moment(date, moment.ISO_8601, true)
 export const resHeaderError = (fnName: string, error: any, data: unknown, res: Response, next: NextFunction) => {
 	logger.error(`Error in ${fnName} -> ${error} .`);
 	logger.error(`Data  in ${fnName} -> ${data} .`);
-	const errorRes = getErrorRes({fnName, error, data});
+	const errorRes = getErrorRes({ fnName, error, data });
 	const json = {
 		message: errorRes.message,
 		errors: errorRes.errors,

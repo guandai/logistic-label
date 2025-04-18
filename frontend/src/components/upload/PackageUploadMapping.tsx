@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Papa, { ParseResult } from 'papaparse';
 import { Box, Typography, Button, Modal, Alert } from '@mui/material';
 import PackageUploadButton, { RunStatus } from './PackageUploadButton';
-import { Upload } from '@mui/icons-material';
+import { SpaceBar, Upload } from '@mui/icons-material';
 import CloseButton from '../dialog/CloseButton';
 import { KeyCsvRecord, HeaderMapping, CSV_KEYS, defaultMapping, CSV_KEYS_REQUIRED } from '@ddlabel/shared';
 import CsvHeaderList from './CsvHeaderList';
@@ -81,9 +81,14 @@ const PackageUploadMapping: React.FC = () => {
   };
 
   const handleModalClose = () => {
-    setModalOpen(false);
-    setRunStatus(RunStatus.ready);
-    setMessage(null);
+    // setModalOpen(false);
+    // setRunStatus(RunStatus.ready);
+    // setMessage(null);
+    // setHeaderMapping(defaultMapping);
+    // setCsvHeaders([]);
+    // setCsvLength(0);
+    // setUploadFile(undefined)
+    window.location.reload();
   };
 
   const TextWithLineBreaks = ({ text }: {text: string}) => {
@@ -103,7 +108,7 @@ const PackageUploadMapping: React.FC = () => {
       </Button>
       <Modal
         open={modalOpen}
-        onClose={handleModalClose}
+        // onClose={handleModalClose}
       >
         <Box sx={{
           position: 'absolute', p: 4, width: 600,
@@ -112,7 +117,8 @@ const PackageUploadMapping: React.FC = () => {
         }}>
           {csvHeaders.length > 0 && (
             <>
-              <Typography variant="h6" id="modal-title">Map CSV Headers</Typography>
+              <Typography variant="h6" sx={ {mb: 2}} id="modal-title">Map CSV Headers</Typography>
+
               {runStatus !== RunStatus.running && <CloseButton handleModalClose={handleModalClose} />}
               {message && <Alert severity={message.level}><TextWithLineBreaks text={message.text}/></Alert>}
               {runStatus === RunStatus.ready &&
