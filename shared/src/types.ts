@@ -19,6 +19,8 @@ type CsvRecordOptional = {
 	height?: number,
 	fromAddress2?: string,
 	toAddress2?: string,
+	fromAddressPhone?: string,
+	toAddressPhone?: string,
 }
 
 export type CsvRecord = CsvRecordOptional & CsvRecordRequired;

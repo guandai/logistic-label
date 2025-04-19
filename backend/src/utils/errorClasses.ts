@@ -38,10 +38,16 @@ export class InvalidCredentialsError extends Error {
 
 export class InvalidInputError extends Error {
 	public status: number;
+	public detail: Record<string, string>;
 
-	constructor(message: string = 'Invalid input provided', name: string = 'InvalidInputError') {
+	constructor(
+		message: string = 'Invalid input provided', 
+		name: string = 'InvalidInputError',
+		detail: Record<string, string> = {}
+	) {
 		super(message);
 		this.name = name
+		this.detail = detail
 		this.status = 400;
 		fixErrorClass(this, InvalidInputError);
 	}

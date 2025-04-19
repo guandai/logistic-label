@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { AxiosProgressEvent } from 'axios';
 import {
   Typography, Box, Button,
-   LinearProgress
+  LinearProgress
 } from '@mui/material';
 import { Upload } from '@mui/icons-material';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { SetMessage } from '../../util/errors';
 import { HeaderMapping } from '@ddlabel/shared';
 import { PackageApi } from '../../api/PackageApi';
@@ -20,8 +20,8 @@ import { SOCKET_IO_HOST } from '../../env_var';
 // }
 
 export enum RunStatus {
-  'ready' , 'running' , 'done'
-} ;
+  'ready', 'running', 'done'
+};
 
 type Prop = {
   setMessage: SetMessage;
@@ -46,12 +46,11 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
   const setUploadSuccess = (text: string) => setMessage({ text, level: 'success' });
 
   useEffect(() => {
-    socket.on('connect', () => {
-      const socketId = socket.id;
-      socket.emit('register', { socketId });
-      console.log(`socket connected`);
-    });
-    
+    // socket.on('connect', () => {
+    //   const socketId = socket.id;
+    //   socket.emit('register', { socketId });
+    // });
+
     socket.on('insert', (data: { processed: number; total: number }) => {
       const progressPercentage = Math.round((data.processed / data.total) * 100);
       setInsertProgress(progressPercentage);
@@ -65,12 +64,12 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
     if (!socket.connected) {
       socket.connect();
     }
-    
+
     return () => {
       socket.off('generate');
       socket.off('insert');
     };
-  }, [socket]);
+  });
 
   const onUploadProgress = (progressEvent: AxiosProgressEvent) => {
     const total = progressEvent.total;
@@ -83,7 +82,7 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
       setUploadInfo('Upload Done. preparing data...');
     }
   };
-  
+
   const handleFileUpload = async (e: any) => {
     if (validateForm && !validateForm()) {
       return;
@@ -104,7 +103,7 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
 
       setRunStatus(RunStatus.done);
       setUploadSuccess(`Import Done - ${response.message}`);
-      
+
     } catch (error: any) {
       const err = error?.constructor.name === 'AxiosError' ? error?.response?.data?.message : error?.message;
       setUploadError(err || 'Failed to import packages.');
@@ -114,33 +113,33 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
 
   // Calculate the buffer value based on some logic or placeholder value
   const valueBuffer = insertProgress !== null ? Math.min(insertProgress + 20, 100) : 0;
-  
-  return (
-  <>
-    {runStatus === RunStatus.ready && <Button variant="contained" color="secondary" startIcon={<Upload />} component="label" >
-      Submit File
-     <button type="button" style={{ display: 'none' }} onClick={handleFileUpload} />
-    </Button>}
 
-    {uploadProgress !== null && (
-      <Box sx={{ width: '100%', mt: 2 }}>
-      <LinearProgress color="success" variant="determinate" value={uploadProgress} />
-      <Typography variant="body2" color="textSecondary">Uploading: {`${Math.round(uploadProgress)}%`}</Typography>
-      </Box>
-    )}
-    {generateProgress !== null && (
-      <Box sx={{ width: '100%', mt: 2 }}>
-      <LinearProgress color="warning" variant="determinate" value={generateProgress} />
-      <Typography variant="body2" color="textSecondary">Generating: {`${Math.round(generateProgress)}%`}</Typography>
-      </Box>
-    )}
-    {insertProgress !== null && (
-      <Box sx={{ width: '100%', mt: 2 }}>
-      <LinearProgress variant="buffer" value={insertProgress} valueBuffer={valueBuffer} />
-      <Typography variant="body2" color="textSecondary">Inserting: {`${Math.round(insertProgress)}%`}</Typography>
-      </Box>
-    )}
-  </>
+  return (
+    <>
+      {runStatus === RunStatus.ready && <Button variant="contained" color="secondary" startIcon={<Upload />} component="label" >
+        Submit File
+        <button type="button" style={{ display: 'none' }} onClick={handleFileUpload} />
+      </Button>}
+
+      {uploadProgress !== null && (
+        <Box sx={{ width: '100%', mt: 2 }}>
+          <LinearProgress color="success" variant="determinate" value={uploadProgress} />
+          <Typography variant="body2" color="textSecondary">Uploading: {`${Math.round(uploadProgress)}%`}</Typography>
+        </Box>
+      )}
+      {generateProgress !== null && (
+        <Box sx={{ width: '100%', mt: 2 }}>
+          <LinearProgress color="warning" variant="determinate" value={generateProgress} />
+          <Typography variant="body2" color="textSecondary">Generating: {`${Math.round(generateProgress)}%`}</Typography>
+        </Box>
+      )}
+      {insertProgress !== null && (
+        <Box sx={{ width: '100%', mt: 2 }}>
+          <LinearProgress variant="buffer" value={insertProgress} valueBuffer={valueBuffer} />
+          <Typography variant="body2" color="textSecondary">Inserting: {`${Math.round(insertProgress)}%`}</Typography>
+        </Box>
+      )}
+    </>
   );
 };
 

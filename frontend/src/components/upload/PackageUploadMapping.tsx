@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Papa, { ParseResult } from 'papaparse';
 import { Box, Typography, Button, Modal, Alert } from '@mui/material';
 import PackageUploadButton, { RunStatus } from './PackageUploadButton';
-import { SpaceBar, Upload } from '@mui/icons-material';
+import { Upload } from '@mui/icons-material';
 import CloseButton from '../dialog/CloseButton';
 import { KeyCsvRecord, HeaderMapping, CSV_KEYS, defaultMapping, CSV_KEYS_REQUIRED } from '@ddlabel/shared';
 import CsvHeaderList from './CsvHeaderList';
