@@ -47,7 +47,7 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 	const errorInit = { 
 		original: error,
 		data,
-		name: error.name,  
+		name: error.constructor.name,  
 		status: 400,
 		message: error.message || 'An error occurred.'
 	};
@@ -57,7 +57,6 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 		case error instanceof UniqueConstraintError:
 			errorRes = { 
 				...errorInit,
-				name: "UniqueConstraintError", 
 				status: 409,
 				message: 'Unique constraint error: Duplicate value detected.',
 				errors: error.errors,
@@ -67,7 +66,6 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 		case error instanceof ValidationError:
 			errorRes = { 
 				...errorInit,
-				name: "ValidationError", 
 				message: 'Validation error: Invalid input data.',
 				errors: error.errors,
 			};
@@ -76,7 +74,6 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 		case error instanceof ForeignKeyConstraintError:
 			errorRes = { 
 				...errorInit,
-				name: "ForeignKeyConstraintError", 
 				message: 'Foreign key constraint error: Invalid reference.',
 				parent: error.parent,
 			};
@@ -85,7 +82,6 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 		case error instanceof DatabaseError:
 			errorRes = { 
 				...errorInit,
-				name: "DatabaseError", 
 				status: 500,
 				message: 'Database error: A general database error occurred.',
 				sql: error.sql,
@@ -95,7 +91,6 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 		case error instanceof TimeoutError:
 			errorRes = { 
 				...errorInit,
-				name: "TimeoutError", 
 				status: 504,
 				message: 'Database timeout error: Query execution exceeded the time limit.',
 				sql: error.sql,
@@ -105,7 +100,6 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 		case error instanceof ConnectionError:
 			errorRes = { 
 				...errorInit,
-				name: "ConnectionError", 
 				status: 503,
 				message: 'Database connection error: Unable to connect to the database.',
 				parent: error.parent,
@@ -115,7 +109,6 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 		case error instanceof OptimisticLockError:
 			errorRes = { 
 				...errorInit,
-				name: "OptimisticLockError", 
 				status: 409,
 				message: 'Optimistic lock error: Concurrent update conflict.',
 				where: error.where,
@@ -125,7 +118,6 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 		case error instanceof NotFoundError:
 			errorRes = { 
 				...errorInit,
-				name: "NotFoundError", 
 				status: 404,
 				message: error.message,
 			};
@@ -134,7 +126,6 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 		case error instanceof InvalidCredentialsError:
 			errorRes = { 
 				...errorInit,
-				name: "InvalidCredentialsError", 
 				status: 401,
 				message: error.message || 'Invalid credentials provided',
 			};
@@ -171,7 +162,6 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 		default:
 			errorRes = { 
 				...errorInit,
-				name: "UnknownError", 
 				status: 500,
 				message: 'An unexpected error occurred.',
 				stack: error.stack,
@@ -179,7 +169,6 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 			break;
 	}
 
-	console.log(`>>>>errorRes`, errorRes);
 	if (!disableLog) {
 		logger.error(`SequelizeError in ${fnName}: ${aggregateError(errorRes.original)}`);
 	}

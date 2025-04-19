@@ -83,6 +83,16 @@ const TranslatedError = {
 	TrackingnoMustBeUniqueError: 'must has an unique trackingNo',
 	MissingToZipError: 'missing receiver address zip',
 	MissingFromZipError: 'missing sender address zip',
+	UniqueConstraintError: 'Unique constraint error: Duplicate value detected.',
+	ValidationError: 'Validation error: Invalid input data.',
+	ForeignKeyConstraintError: 'Foreign key constraint error: Invalid reference.',
+	DatabaseError: 'Database error: A general database error occurred.',
+	TimeoutError: 'Database timeout error: Query execution exceeded the time limit.',
+	ConnectionError: 'Database connection error: Unable to connect to the database.',
+	OptimisticLockError: 'Optimistic lock error: Concurrent update conflict.',
+	NotFoundError: 'error.message',
+	InvalidCredentialsError: 'Invalid credentials provided',
+	UnknownError: 'An unexpected error occurred.'
 };
 
 const formatErrorForFe = (key: string, count: number) => 

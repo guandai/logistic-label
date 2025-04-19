@@ -10,8 +10,6 @@ import { SetMessage } from '../../util/errors';
 import { HeaderMapping } from '@ddlabel/shared';
 import { PackageApi } from '../../api/PackageApi';
 import { SOCKET_IO_HOST } from '../../env_var';
-import { fi } from 'date-fns/locale';
-
 
 // // Extend the Window interface to include the 'socket' property
 // declare global {
