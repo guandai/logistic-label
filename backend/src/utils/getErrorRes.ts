@@ -1,7 +1,7 @@
 import { UniqueConstraintError, ValidationError, ForeignKeyConstraintError, DatabaseError, TimeoutError, ConnectionError, OptimisticLockError, ValidationErrorItem } from "sequelize";
 import logger from "../config/logger";
 import { ErrorRes } from "../types";
-import { NotFoundError, InvalidCredentialsError, InvalidInputError } from "./errorClasses";
+import { NotFoundError, InvalidCredentialsError, InvalidInputError, TrackingnoMustBeUniqueError, MissingFromZipError, MissingToZipError } from "./errorClasses";
 import { toCamelCase } from "./errors";
 
 const reducedError = (error: Error | ValidationErrorItem) => {
@@ -35,86 +35,154 @@ export const aggregateError = (error: UniqueConstraintError | Error[] | Error): 
 }
 
 
-const logSequelizeError = (fnName: string, errRes: ErrorRes, disableLog = false) => {
-	!disableLog && logger.error(`SequelizeError in ${fnName}: ${aggregateError(errRes.original)}`);
-	return errRes;
-};
 type SequelizeErrorParams = {
 	fnName: string;
 	error: any;
 	data?: unknown;
 	disableLog?: boolean;
 }
+
 export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 	const { fnName, error, data, disableLog = false } = params;
-	let errorRes;
+	const errorInit = { 
+		original: error,
+		data,
+		name: error.name,  
+		status: 400,
+		message: error.message || 'An error occurred.'
+	};
 
+	let errorRes: ErrorRes
 	switch (true) {
 		case error instanceof UniqueConstraintError:
-			errorRes = { original: error, data, name: error.name, 
-				status: 409, message: 'Unique constraint error: Duplicate value detected.',
+			errorRes = { 
+				...errorInit,
+				name: "UniqueConstraintError", 
+				status: 409,
+				message: 'Unique constraint error: Duplicate value detected.',
 				errors: error.errors,
 			};
 			break;
+
 		case error instanceof ValidationError:
-			errorRes = { original: error, data, name: error.name, 
-				status: 400, message: 'Validation error: Invalid input data.',
+			errorRes = { 
+				...errorInit,
+				name: "ValidationError", 
+				message: 'Validation error: Invalid input data.',
 				errors: error.errors,
 			};
 			break;
+
 		case error instanceof ForeignKeyConstraintError:
-			errorRes = { original: error, data, name: error.name, 
-				status: 400, message: 'Foreign key constraint error: Invalid reference.',
+			errorRes = { 
+				...errorInit,
+				name: "ForeignKeyConstraintError", 
+				message: 'Foreign key constraint error: Invalid reference.',
 				parent: error.parent,
 			};
 			break;
+
 		case error instanceof DatabaseError:
-			errorRes = { original: error, data, name: error.name, 
-				status: 500, message: 'Database error: A general database error occurred.',
+			errorRes = { 
+				...errorInit,
+				name: "DatabaseError", 
+				status: 500,
+				message: 'Database error: A general database error occurred.',
 				sql: error.sql,
 			};
 			break;
+
 		case error instanceof TimeoutError:
-			errorRes = { original: error, data, name: error.name, 
-				status: 504, message: 'Database timeout error: Query execution exceeded the time limit.',
+			errorRes = { 
+				...errorInit,
+				name: "TimeoutError", 
+				status: 504,
+				message: 'Database timeout error: Query execution exceeded the time limit.',
 				sql: error.sql,
 			};
 			break;
+
 		case error instanceof ConnectionError:
-			errorRes = { original: error, data, name: error.name, 
-				status: 503, message: 'Database connection error: Unable to connect to the database.',
+			errorRes = { 
+				...errorInit,
+				name: "ConnectionError", 
+				status: 503,
+				message: 'Database connection error: Unable to connect to the database.',
 				parent: error.parent,
 			};
 			break;
+
 		case error instanceof OptimisticLockError:
-			errorRes = { original: error, data, name: error.name, 
-				status: 409, message: 'Optimistic lock error: Concurrent update conflict.',
+			errorRes = { 
+				...errorInit,
+				name: "OptimisticLockError", 
+				status: 409,
+				message: 'Optimistic lock error: Concurrent update conflict.',
 				where: error.where,
 			};
 			break;
 
 		case error instanceof NotFoundError:
-			errorRes = { original: error, data, name: error.name, 
-				status: 404, message: error.message,
+			errorRes = { 
+				...errorInit,
+				name: "NotFoundError", 
+				status: 404,
+				message: error.message,
 			};
 			break;
+
 		case error instanceof InvalidCredentialsError:
-			errorRes = { original: error, data, name: error.name, 
-				status: 401, message: error.message || 'Invalid credentials provided',
+			errorRes = { 
+				...errorInit,
+				name: "InvalidCredentialsError", 
+				status: 401,
+				message: error.message || 'Invalid credentials provided',
 			};
 			break;
+		
+		case error instanceof MissingFromZipError:
+			errorRes = { 
+				...errorInit,
+				message: error.message || 'Sender Address Zip Code is required.',
+			};
+			break;
+
+		case error instanceof MissingToZipError:
+			errorRes = { 
+				...errorInit,
+				message: error.message || 'Receiver Address Zip Code is required.',
+			};
+			break;
+
+		case error instanceof TrackingnoMustBeUniqueError:
+			errorRes = { 
+				...errorInit,
+				message: error.message || 'Tracking number must be unique.',
+			};
+			break;
+
 		case error instanceof InvalidInputError:
-			errorRes = { original: error, data, name: error.name, 
-				status: 400, message: error.message || 'Invalid input provided',
+			errorRes = { 
+				...errorInit,
+				message: error.message || 'Invalid input provided',
 			};
 			break;
+
 		default:
-			errorRes = { original: error, data, name: error.name, 
-				status: 500, message: 'An unexpected error occurred.',
+			errorRes = { 
+				...errorInit,
+				name: "UnknownError", 
+				status: 500,
+				message: 'An unexpected error occurred.',
 				stack: error.stack,
 			};
 			break;
 	}
 
-	return logSequelizeError(fnName, errorRes, disableLog);
+	console.log(`>>>>errorRes`, errorRes);
+	if (!disableLog) {
+		logger.error(`SequelizeError in ${fnName}: ${aggregateError(errorRes.original)}`);
+	}
+
+	return errorRes;
 };

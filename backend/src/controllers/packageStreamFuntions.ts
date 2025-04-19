@@ -2,12 +2,13 @@
 import { ResponseAdv, PackageSource, AddressEnum, SimpleRes } from '@ddlabel/shared';
 import logger from '../config/logger';
 import { AuthRequest, BatchDataType, CsvData } from '../types';
-import { ternaryPutError, reducedConstraintError } from '../utils/errors';
+import { setPkgErrors } from '../utils/errors';
 import { generateTrackingNo } from '../utils/generateTrackingNo';
 import reportIoSocket from '../utils/reportIo';
 import { getPreparedData, processBatch } from './packageBatchFuntions';
 import fs from 'fs';
 import { aggregateError, getErrorRes } from '../utils/getErrorRes';
+import { TrackingnoMustBeUniqueError } from '../utils/errorClasses';
 
 type OnDataParams = {
 	req: AuthRequest,
@@ -68,31 +69,34 @@ export const onData = async ({ req, csvData, pkgGlobal }: OnDataParams) => {
 	const { packageCsvMap, packageCsvLength } = req.body;
 	pkgGlobal.processed ++;
 	const prepared = await getPreparedData(packageCsvMap, csvData);
-
-	if ('csvUploadError' in prepared) {
-		console.log(`csvUploadError`, prepared.csvUploadError);
-		ternaryPutError(prepared.csvUploadError.name, pkgGlobal, prepared.csvUploadError);	
-	} else {
-		pkgGlobalPush(req, pkgGlobal, prepared);
+	if ( prepared.csvUploadErrors.length > 0 ) {
+		console.log(`csvUploadErrors`, prepared.csvUploadErrors);
+		prepared.csvUploadErrors.forEach(error => {
+			setPkgErrors(error, pkgGlobal);
+		})
 	}
+	pkgGlobalPush(req, pkgGlobal, prepared);
 	reportIoSocket({ eventName: 'generate', req, processed: pkgGlobal.processed + 1, total: packageCsvLength });
 };
 
 const TranslatedError = {
-	trackingnoMustBeUnique: 'must has an unique trackingNo',
-	missingToZip: 'missing receiver address zip',
-	missingFromZip: 'missing sender address zip',
+	TrackingnoMustBeUniqueError: 'must has an unique trackingNo',
+	MissingToZipError: 'missing receiver address zip',
+	MissingFromZipError: 'missing sender address zip',
 };
-const formatErrorForFe = (key: string, count: number) => `${count} resource(s) ${TranslatedError[key as keyof typeof TranslatedError]}`;
+
+const formatErrorForFe = (key: string, count: number) => 
+	`${count} resource(s) ${TranslatedError[key as keyof typeof TranslatedError]}`;
+
 const finishProcessing = (params: FinishEndParams) => {
 	const { res, pkgGlobal, file } = params;
 	deleteUploadedFile(file);
-	if (pkgGlobal.errorMap.length > 0 || Object.values(pkgGlobal.errorHash).some(x => x > 0)) {
-		const messageMaps = pkgGlobal.errorMap.map(e => e.message).join(',\n ');
-		const messagehash = Object.entries(pkgGlobal.errorHash).map(([key, count]) => formatErrorForFe(key, count)).join('\n ');
+	if (pkgGlobal.errorMap.length > 0 || Object.values(pkgGlobal.errorCount).some(x => x > 0)) {
+		// const errorMapsMsg = pkgGlobal.errorMap.map(e => e.message).join(',\n ');
+		const errorCountMsg = Object.entries(pkgGlobal.errorCount).map(([key, count]) => formatErrorForFe(key, count)).join('\n ');
 		return res.status(400).json({ 
 			errors: pkgGlobal.errorMap, 
-			message: `Importing Done with error: \n${messageMaps}${messagehash}` });
+			message: `Importing Done with error: \n ${errorCountMsg}` });
 	}
 	res.json({ message: `Importing Done!` });
 	// resHeaderError('getUsers', error, req.query, res, next);
@@ -109,7 +113,7 @@ export const onEnd = async (params: OnEndParams) => {
 		const batchData: BatchDataType = {
 			processed: Math.min(end, pkgArr.length),
 			errorMap: [],
-			errorHash: {},
+			errorCount: {},
 			pkgArr: pkgArr.slice(start, end),
 			shipFromArr: shipFromArr.slice(start, end),
 			shipToArr: shipToArr.slice(start, end),
@@ -117,9 +121,10 @@ export const onEnd = async (params: OnEndParams) => {
 		try {
 			await processBatch(batchData);
 		} catch (error: any) {
-			const errorRes = getErrorRes({ fnName: 'onEnd', error });
+			const trackError = new TrackingnoMustBeUniqueError(error)
+			const errorRes = getErrorRes({ fnName: 'onEnd', error: trackError });
 			logger.error(`Error in onEnd: ${errorRes.message}`);
-			ternaryPutError('trackingnoMustBeUnique', pkgGlobal, errorRes);
+			setPkgErrors(errorRes, pkgGlobal);
 		} finally {
 			reportIoSocket({ eventName: 'insert', req, processed: batchData.processed, total: pkgArr.length });
 		}

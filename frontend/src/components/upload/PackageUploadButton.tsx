@@ -10,6 +10,7 @@ import { SetMessage } from '../../util/errors';
 import { HeaderMapping } from '@ddlabel/shared';
 import { PackageApi } from '../../api/PackageApi';
 import { SOCKET_IO_HOST } from '../../env_var';
+import { fi } from 'date-fns/locale';
 
 
 // // Extend the Window interface to include the 'socket' property
@@ -68,6 +69,7 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
     return () => {
       socket.off('generate');
       socket.off('insert');
+      socket.disconnect();
     };
   });
 
@@ -108,6 +110,8 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
       const err = error?.constructor.name === 'AxiosError' ? error?.response?.data?.message : error?.message;
       setUploadError(err || 'Failed to import packages.');
       setRunStatus(RunStatus.done);
+    } finally {
+      socket.disconnect();
     }
   };
 

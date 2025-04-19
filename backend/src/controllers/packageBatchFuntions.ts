@@ -6,7 +6,7 @@ import { isValidJSON } from '../utils/errors';
 import { CsvRecord, defaultMapping, CSV_KEYS, HeaderMapping, KeyCsvRecord } from '@ddlabel/shared';
 import { CsvData, PreparedData, BatchDataType } from '../types';
 import { getErrorRes } from '../utils/getErrorRes';
-import { InvalidInputError } from '../utils/errorClasses';
+import { InvalidInputError, MissingFromZipError, MissingToZipError } from '../utils/errorClasses';
 
 const getMappingData = (headers: CsvData, headerMapping: HeaderMapping): CsvRecord => {
 	return CSV_KEYS.reduce((acc: CsvRecord, csvKey: KeyCsvRecord) => {
@@ -15,22 +15,29 @@ const getMappingData = (headers: CsvData, headerMapping: HeaderMapping): CsvReco
 	}, {} as CsvRecord);
 }
 
+export const flatCsvData = (csvData: CsvData): String => 
+	Object.keys(csvData).reduce((acc: string, csvKey: string) => {
+		const value = csvData[csvKey];
+		const line = !!value ? `${csvKey}: ${value}` : '';
+		return acc + line + '\n';
+	}, '');
 
-export const getPreparedData = async (packageCsvMap: string, csvData: CsvData): Promise<PreparedData> => {
+export const getPreparedData = async (packageCsvMap: string, data: CsvData): Promise<PreparedData> => {
 	const headerMapping: HeaderMapping = isValidJSON(packageCsvMap) ? JSON.parse(packageCsvMap) : defaultMapping;
-	const mappedData = getMappingData(csvData, headerMapping);
+	const mappedData = getMappingData(data, headerMapping);
 	const fromZipInfo = getZipInfo(getFromAddressZip(mappedData));
 	const toZipInfo = getZipInfo(getToAddressZip(mappedData));
+	const csvUploadErrors = [];
 
 	if (!fromZipInfo) { 
-		const error = new InvalidInputError(`getPreparedData has no fromAddressZip`, 'missingFromZip');
-		return { csvUploadError: getErrorRes({ fnName: 'getPreparedData:missingFromZip', error, data: csvData, disableLog: true } ) };
+		const error = new MissingFromZipError(`getPreparedData has no fromAddressZip: ${flatCsvData(data)}`);
+		csvUploadErrors.push( getErrorRes({ fnName: 'getPreparedData', error, data, disableLog: true } ) );
 	}
 	if (!toZipInfo) { 
-		const error = new InvalidInputError(`getPreparedData has no toAddressZip`, "missingToZip");
-		return { csvUploadError: getErrorRes( { fnName: 'getPreparedData:missingToZip', error, data: mappedData['toAddress1'], disableLog: true } ) };
+		const error = new MissingToZipError(`getPreparedData has no toAddressZip: ${flatCsvData(data)}`);
+		csvUploadErrors.push ( getErrorRes( { fnName: 'getPreparedData', error, data, disableLog: true } ) );
 	}
-	return { mappedData, fromZipInfo, toZipInfo };
+	return { mappedData, fromZipInfo, toZipInfo, csvUploadErrors };
 }
 
 export const processBatch = async (batchData: BatchDataType) => {

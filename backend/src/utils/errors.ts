@@ -15,14 +15,25 @@ export const isValidJSON = (str: string) => {
 		return false;
 	}
 }
-export const ternaryPutError = (
-	name: string, 
+
+export const setErrorCount = (
+	error: ErrorRes,
 	pkgGlobal: BatchDataType, 
-	error: ErrorRes
-) =>
-	(name in pkgGlobal.errorHash)
-		? pkgGlobal.errorHash[name]++
-		: pkgGlobal.errorMap.push(error);
+) =>{
+	 	const name = error.name
+		pkgGlobal.errorCount[name] = (pkgGlobal.errorCount[name] ?? 0) + 1
+	}
+
+export const fillErrorMap = (
+			error: ErrorRes,
+			pkgGlobal: BatchDataType, 
+		) =>
+			pkgGlobal.errorMap.push(error)
+
+export const setPkgErrors = (error: ErrorRes, pkgGlobal: BatchDataType) =>{
+		setErrorCount(error, pkgGlobal);
+		fillErrorMap(error, pkgGlobal);
+}
 
 export const toCamelCase = (str: string): string =>
 	str.split(/[\s-_]+/)  // Split by spaces, dashes, or underscores

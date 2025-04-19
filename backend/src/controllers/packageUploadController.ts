@@ -20,7 +20,7 @@ export const importPackages = async (req: AuthRequest, res: ResponseAdv<ImportPa
 		const pkgGlobal: BatchDataType = {
 			processed: 0,
 			errorMap: [],
-			errorHash: { missingToZip:0 , missingFromZip: 0, trackingnoMustBeUnique: 0 },
+			errorCount: {},
 			pkgArr: [],
 			shipFromArr: [],
 			shipToArr: [],

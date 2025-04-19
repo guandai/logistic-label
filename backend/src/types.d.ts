@@ -5,10 +5,12 @@ export interface AuthRequest extends Request {
 	user?: UserAttributes;
 }
 
+export type ErrorCount = Record<ErrorInstanceName, number>
+
 export type BatchDataType = {
 	processed: number,
 	errorMap: ErrorRes[],
-	errorHash: Record<string, number>,
+	errorCount: Partial<ErrorCount>,
 	pkgArr: PackageRoot[],
 	shipFromArr: AddressCreationAttributes[],
 	shipToArr: AddressCreationAttributes[],
@@ -16,16 +18,33 @@ export type BatchDataType = {
 
 
 export type CsvData = { [k: string]: string | number };
+
 export type PreparedData = {
 	mappedData: CsvRecord,
 	fromZipInfo: any,
 	toZipInfo: any,
-} | {
-	csvUploadError: ErrorRes,
+	csvUploadErrors: ErrorRes[],
 }
 
+export type ErrorInstanceName =
+	"MissingToZipError" |
+	"MissingFromZipError" |
+	"TrackingnoMustBeUniqueError" |
+
+	"UnknownError" |
+	"UniqueConstraintError" |
+	"ValidationError" |
+	"ForeignKeyConstraintError" |
+	"DatabaseError" |
+	"TimeoutError" |
+	"ConnectionError" |
+	"OptimisticLockError" |
+	"NotFoundError" |
+	"InvalidCredentialsError" |
+	"InvalidInputError"
+
 export type ErrorRes = {
-	name: string,
+	name: ErrorInstanceName,
 	original: any;
 	data: unknown;
 	status: number;
