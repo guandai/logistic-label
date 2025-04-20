@@ -23,6 +23,7 @@ export enum RunStatus {
 };
 
 type Prop = {
+  closeButton: JSX.Element;
   setMessage: SetMessage;
   runStatus: RunStatus;
   setRunStatus: (status: RunStatus) => void;
@@ -36,10 +37,12 @@ type Prop = {
 const socket = io(`${SOCKET_IO_HOST}`, { path: '/api/socket.io', autoConnect: false });
 
 export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
-  const { runStatus, setRunStatus, setMessage, headerMapping, uploadFile, validateForm, csvLength } = prop;
+  const { closeButton, runStatus, setRunStatus, setMessage, headerMapping, uploadFile, validateForm, csvLength } = prop;
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [generateProgress, setGenerateProgress] = useState<number | null>(null);
   const [insertProgress, setInsertProgress] = useState<number | null>(null);
+  const [errorResults, setErrorResults] = useState<object | undefined>(undefined);
+
   const setUploadError = (text: string) => setMessage({ text, level: 'error' });
   const setUploadInfo = (text: string) => setMessage({ text, level: 'info' });
   const setUploadSuccess = (text: string) => setMessage({ text, level: 'success' });
@@ -60,16 +63,22 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
       setGenerateProgress(progressPercentage);
     });
 
-    if (!socket.connected) {
+    if (runStatus === RunStatus.ready && !socket.connected) {
+      console.log(`connecting to socket...`);
       socket.connect();
+    }
+
+    if (runStatus === RunStatus.done) {
+      console.log(`disconnect, uploadProgress:`);
+      socket.disconnect();
     }
 
     return () => {
       socket.off('generate');
       socket.off('insert');
-      socket.disconnect();
     };
-  });
+  }, [runStatus]);
+
 
   const onUploadProgress = (progressEvent: AxiosProgressEvent) => {
     const total = progressEvent.total;
@@ -82,6 +91,21 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
       setUploadInfo('Upload Done. preparing data...');
     }
   };
+
+  const downloadErrorButton = (data: object) => (
+    <Button 
+      variant="contained" color="primary" onClick={() => {
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'errorResults.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      }}>
+      Download Details
+    </Button>
+  );
 
   const handleFileUpload = async (e: any) => {
     if (validateForm && !validateForm()) {
@@ -103,30 +127,36 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
 
       setRunStatus(RunStatus.done);
       setUploadSuccess(`Import Done - ${response.message}`);
-
+      
+      setErrorResults(response.errors);
     } catch (error: any) {
       const err = error?.constructor.name === 'AxiosError' ? error?.response?.data?.message : error?.message;
       setUploadError(err || 'Failed to import packages.');
       setRunStatus(RunStatus.done);
     } finally {
+      console.log(`disconnect, uploadProgress: ${uploadProgress}`);
       socket.disconnect();
     }
   };
+  
 
   // Calculate the buffer value based on some logic or placeholder value
   const valueBuffer = insertProgress !== null ? Math.min(insertProgress + 20, 100) : 0;
-
+  const progress = uploadProgress ? Math.round(uploadProgress) : 0;
   return (
     <>
+      
       {runStatus === RunStatus.ready && <Button variant="contained" color="secondary" startIcon={<Upload />} component="label" >
         Submit File
         <button type="button" style={{ display: 'none' }} onClick={handleFileUpload} />
       </Button>}
 
-      {uploadProgress !== null && (
+      {uploadProgress !==null && (
         <Box sx={{ width: '100%', mt: 2 }}>
-          <LinearProgress color="success" variant="determinate" value={uploadProgress} />
-          <Typography variant="body2" color="textSecondary">Uploading: {`${Math.round(uploadProgress)}%`}</Typography>
+          <LinearProgress color="success" variant="determinate" value={progress} />
+          <Typography variant="body2" color="textSecondary">
+            {progress === 100 ? 'Done' : 'Uploading'}: {`${Math.round(progress)}%`}
+          </Typography>
         </Box>
       )}
       {generateProgress !== null && (
@@ -139,6 +169,17 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
         <Box sx={{ width: '100%', mt: 2 }}>
           <LinearProgress variant="buffer" value={insertProgress} valueBuffer={valueBuffer} />
           <Typography variant="body2" color="textSecondary">Inserting: {`${Math.round(insertProgress)}%`}</Typography>
+        </Box>
+      )}
+      {runStatus === RunStatus.done && (
+        // make a download button , include the json file, the content is errorResults
+        <Box sx={{mt: 2, display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+          <Box sx={{flexGrow: 1}} >
+            {errorResults ? downloadErrorButton(errorResults) : null}
+          </Box>
+          <Box sx={{flexGrow: 1}} >
+            {closeButton}
+          </Box>
         </Box>
       )}
     </>

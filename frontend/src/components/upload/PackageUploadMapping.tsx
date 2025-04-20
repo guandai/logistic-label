@@ -100,6 +100,11 @@ const PackageUploadMapping: React.FC = () => {
     );
   };
 
+  const closeButton = 
+    <Button variant="contained" color="secondary" onClick={handleModalClose} sx={{ ml: 2, float: 'right' }}>
+      Close
+    </Button>
+
   return (
     <>
       <Button variant="contained" disabled={runStatus === RunStatus.running} startIcon={<Upload />} component="label" fullWidth >
@@ -129,6 +134,7 @@ const PackageUploadMapping: React.FC = () => {
                 />
               }
               {uploadFile && <PackageUploadButton
+                closeButton={closeButton}
                 setMessage={setMessage}
                 uploadFile={uploadFile}
                 headerMapping={headerMapping}

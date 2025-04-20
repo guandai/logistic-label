@@ -19,7 +19,7 @@ export const flatCsvData = (csvData: CsvData): String =>
 	Object.keys(csvData).reduce((acc: string, csvKey: string) => {
 		const value = csvData[csvKey];
 		const line = !!value ? `${csvKey}: ${value}` : '';
-		return acc + line + '\n';
+		return line ? `${acc} ${line}\n` : acc;
 	}, '');
 
 export const getPreparedData = async (packageCsvMap: string, data: CsvData): Promise<PreparedData> => {
