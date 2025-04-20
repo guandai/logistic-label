@@ -16,10 +16,12 @@ const fixErrorClass = (scope: any, errorClass: Function) => {
 
 export class UnknownError extends Error {
 	public status: number;
+	public data: Record<string, unknown>;
 
-	constructor(message: string = 'No Message Unknown Error', name = 'UnknownError') {
+	constructor(message = 'No Message Unknown Error', name = 'UnknownError', data: Record<string, unknown> = {}) {
 		super(message);
 		this.name = name;
+		this.data = data;
 		this.status = 500;
 		fixErrorClass(this, NotFoundError);
 	}
@@ -49,13 +51,16 @@ export class InvalidCredentialsError extends Error {
 
 export class InvalidInputError extends Error {
 	public status: number;
-
+	public data: Record<string, unknown>;
+	
 	constructor(
 		message: string = 'Invalid input provided',
 		name: string = 'InvalidInputError',
+		data: Record<string, unknown> = {},
 	) {
 		super(message);
 		this.name = name
+		this.data = data;
 		this.status = 400;
 		fixErrorClass(this, InvalidInputError);
 	}

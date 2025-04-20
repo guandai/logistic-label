@@ -59,7 +59,7 @@ const main = async () => {
     const mergedData = mergeData(stateData, geoData);
     
     await writeJSONFile('merged.json', mergedData);
-    console.log('Merged data saved to merged.json');
+    console.log('>> Merged data saved to merged.json');
   } catch (error) {
     console.error('Error reading, processing, or writing files:', error);
   }

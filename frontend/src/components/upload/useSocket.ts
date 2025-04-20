@@ -41,7 +41,7 @@ export const useSocket = (
     }
 
     if (runStatus === RunStatus.done) {
-      console.log(`dis`);
+      console.log(`disconnecting socket...`);
       stopSocket();
     }
 

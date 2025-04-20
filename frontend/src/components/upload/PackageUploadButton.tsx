@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AxiosProgressEvent } from 'axios';
 import {
   Typography, Box, Button,
@@ -6,10 +6,11 @@ import {
 } from '@mui/material';
 import { Upload } from '@mui/icons-material';
 import { SetMessage } from '../../util/errors';
-import { HeaderMapping } from '@ddlabel/shared';
+import { ErrorRes, HeaderMapping } from '@ddlabel/shared';
 import { PackageApi } from '../../api/PackageApi';
 import { DownloadErrorButton } from './DownloadErrorButton';
 import { useSocket } from './useSocket';
+import { jsonToCsv, jsonToTxt } from './downloadFn';
 
 export enum RunStatus {
   'ready', 'running', 'done'
@@ -32,18 +33,12 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [generateProgress, setGenerateProgress] = useState<number | null>(null);
   const [insertProgress, setInsertProgress] = useState<number | null>(null);
-  const [errorResults, setErrorResults] = useState<unknown[] | undefined>(undefined);
+  const [errorResults, setErrorResults] = useState<ErrorRes[] | undefined>(undefined);
 
   const setUploadError = (text: string) => setMessage({ text, level: 'error' });
   const setUploadInfo = (text: string) => setMessage({ text, level: 'info' });
   const setUploadSuccess = (text: string) => setMessage({ text, level: 'success' }); 
   const socket = useSocket(runStatus, setInsertProgress, setGenerateProgress);
- 
-  useEffect(() => {
-    if (errorResults) {
-      console.log('Error results updated:', errorResults);
-    }
-  }, [errorResults]);
 
   const onUploadProgress = (progressEvent: AxiosProgressEvent) => {
     const total = progressEvent.total;
@@ -78,7 +73,6 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
   }
 
   const handleFileUpload = async () => {
-
     try {
       const formData = getFormData();
       if (!formData) {
@@ -107,6 +101,7 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
 
   const valueBuffer = insertProgress !== null ? Math.min(insertProgress + 20, 100) : 0;
   const progress = uploadProgress ? Math.round(uploadProgress) : 0;
+
 
   return (
     <>
@@ -143,7 +138,8 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
       {runStatus === RunStatus.done && (
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', width: '100%' }}>
           <Box sx={{ flexGrow: 1 }}>
-            { !!errorResults?.length ? <DownloadErrorButton data={errorResults} /> : null }
+            { !!errorResults?.length ? <DownloadErrorButton dataStr={jsonToTxt(errorResults)} text="Detail(JSON)" /> : null }
+            { !!errorResults?.length ? <DownloadErrorButton dataStr={jsonToCsv(errorResults)} text="Detail(CSV)" /> : null }
           </Box>
           <Box sx={{ flexGrow: 1 }}>
             {closeButton}

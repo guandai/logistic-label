@@ -44,7 +44,7 @@ const main = async () => {
     const geoData = await readJSONFile('geoData.json');
 
     const mergedData = mergeData(stateData, geoData);
-    console.log(mergedData);
+    console.log('>>mergedData'.mergedData);
   } catch (error) {
     console.error('Error reading or processing files:', error);
   }
