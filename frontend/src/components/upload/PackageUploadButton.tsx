@@ -5,11 +5,11 @@ import {
   LinearProgress
 } from '@mui/material';
 import { Upload } from '@mui/icons-material';
-import { io } from 'socket.io-client';
 import { SetMessage } from '../../util/errors';
 import { HeaderMapping } from '@ddlabel/shared';
 import { PackageApi } from '../../api/PackageApi';
-import { SOCKET_IO_HOST } from '../../env_var';
+import { DownloadErrorButton } from './DownloadErrorButton';
+import { useSocket } from './useSocket';
 
 export enum RunStatus {
   'ready', 'running', 'done'
@@ -26,45 +26,24 @@ type Prop = {
   csvLength: number;
 };
 
-const socket = io(`${SOCKET_IO_HOST}`, { path: '/api/socket.io', autoConnect: false });
-
+// const socket = io(`${SOCKET_IO_HOST}`, { path: '/api/socket.io', autoConnect: false });
 export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
   const { closeButton, runStatus, setRunStatus, setMessage, headerMapping, uploadFile, validateForm, csvLength } = prop;
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [generateProgress, setGenerateProgress] = useState<number | null>(null);
   const [insertProgress, setInsertProgress] = useState<number | null>(null);
-  const [errorResults, setErrorResults] = useState<object | undefined>(undefined);
+  const [errorResults, setErrorResults] = useState<unknown[] | undefined>(undefined);
 
   const setUploadError = (text: string) => setMessage({ text, level: 'error' });
   const setUploadInfo = (text: string) => setMessage({ text, level: 'info' });
-  const setUploadSuccess = (text: string) => setMessage({ text, level: 'success' });
-
+  const setUploadSuccess = (text: string) => setMessage({ text, level: 'success' }); 
+  const socket = useSocket(runStatus, setInsertProgress, setGenerateProgress);
+ 
   useEffect(() => {
-    socket.on('insert', (data: { processed: number; total: number }) => {
-      const progressPercentage = Math.round((data.processed / data.total) * 100);
-      setInsertProgress(progressPercentage);
-    });
-
-    socket.on('generate', (data: { processed: number; total: number }) => {
-      const progressPercentage = Math.round((data.processed / data.total) * 100);
-      setGenerateProgress(progressPercentage);
-    });
-
-    if (runStatus === RunStatus.ready && !socket.connected) {
-      console.log('Connecting to socket...');
-      socket.connect();
+    if (errorResults) {
+      console.log('Error results updated:', errorResults);
     }
-
-    if (runStatus === RunStatus.done) {
-      console.log('Disconnecting socket...');
-      socket.disconnect();
-    }
-
-    return () => {
-      socket.off('generate');
-      socket.off('insert');
-    };
-  }, [runStatus]);
+  }, [errorResults]);
 
   const onUploadProgress = (progressEvent: AxiosProgressEvent) => {
     const total = progressEvent.total;
@@ -78,53 +57,51 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
     }
   };
 
-  const downloadErrorButton = (data: object) => (
-    <Button
-      variant="contained"
-      color="primary"
-      onClick={() => {
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'errorResults.json';
-        a.click();
-        URL.revokeObjectURL(url);
-      }}
-    >
-      Download Details
-    </Button>
-  );
-
-  const handleFileUpload = async () => {
+  const getFormData = () => {
     if (validateForm && !validateForm()) {
+      setUploadError('Validation failed. Please check the form.');
       return;
     }
 
     const token = localStorage.getItem('token');
     if (!token) {
-      return setUploadInfo('Please login');
+      setUploadInfo('Please login');
+      return;
     }
 
+    const formData = new FormData();
+    formData.append('packageCsvFile', uploadFile);
+    formData.append('packageCsvLength', csvLength?.toString() || '0');
+    formData.append('packageCsvMap', JSON.stringify(headerMapping));
+
+    return formData;
+  }
+
+  const handleFileUpload = async () => {
+
     try {
-      const formData = new FormData();
-      formData.append('packageCsvFile', uploadFile);
-      formData.append('packageCsvLength', csvLength?.toString() || '0');
-      formData.append('packageCsvMap', JSON.stringify(headerMapping));
+      const formData = getFormData();
+      if (!formData) {
+        return
+      }
 
       setRunStatus(RunStatus.running);
       const response = await new PackageApi().importPackage(formData, onUploadProgress, socket.id);
 
       setRunStatus(RunStatus.done);
       setUploadSuccess(`Import Done - ${response.message}`);
-      setErrorResults(response.errors);
+      
     } catch (error: any) {
-      const err = error?.constructor.name === 'AxiosError' ? error?.response?.data?.message : error?.message;
-      setUploadError(err || 'Failed to import packages.');
+      const errMsg = error?.constructor.name === 'AxiosError' 
+        ? error?.response?.data?.message 
+        : error?.message;
+      const errErrors = error?.constructor.name === 'AxiosError' 
+        ? error?.response?.data?.errors 
+        : error?.errors;
+
+      setUploadError(errMsg || 'Failed to import packages.');
       setRunStatus(RunStatus.done);
-    } finally {
-      console.log(`disconnect, uploadProgress: ${uploadProgress}`);
-      socket.disconnect();
+      setErrorResults(errErrors);
     }
   };
 
@@ -166,7 +143,7 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
       {runStatus === RunStatus.done && (
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', width: '100%' }}>
           <Box sx={{ flexGrow: 1 }}>
-            {errorResults ? downloadErrorButton(errorResults) : null}
+            { !!errorResults?.length ? <DownloadErrorButton data={errorResults} /> : null }
           </Box>
           <Box sx={{ flexGrow: 1 }}>
             {closeButton}
