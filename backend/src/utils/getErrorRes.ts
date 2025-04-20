@@ -1,8 +1,8 @@
 import { UniqueConstraintError, ValidationError, ForeignKeyConstraintError, DatabaseError, TimeoutError, ConnectionError, OptimisticLockError, ValidationErrorItem } from "sequelize";
 import logger from "../config/logger";
-import { ErrorRes } from "../types";
-import { NotFoundError, InvalidCredentialsError, InvalidInputError, TrackingnoMustBeUniqueError, MissingFromZipError, MissingToZipError } from "./errorClasses";
+import { NotFoundError, InvalidCredentialsError, InvalidInputError, TrackingnoMustBeUniqueError, MissingFromZipError, MissingToZipError, UnknownError } from "./errorClasses";
 import { toCamelCase } from "./errors";
+import { ErrorRes } from "@ddlabel/shared";
 
 const reducedError = (error: Error | ValidationErrorItem) => {
     const properties = {
@@ -37,18 +37,20 @@ export const aggregateError = (error: UniqueConstraintError | Error[] | Error): 
 
 type SequelizeErrorParams = {
 	fnName: string;
+	name?: string;
+	status?: number;
 	error: any;
 	data?: unknown;
 	disableLog?: boolean;
 }
 
 export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
-	const { fnName, error, data, disableLog = false } = params;
+	const { fnName, error, data, name, status, disableLog = false } = params;
 	const errorInit = { 
 		original: error,
 		data,
-		name: error.constructor.name,  
-		status: 400,
+		name: name || error.constructor.name,  
+		status: status || 400,
 		message: error.message || 'An error occurred.'
 	};
 
@@ -158,12 +160,19 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 				message: error.message || 'Invalid input provided',
 			};
 			break;
+		
+		case error instanceof UnknownError:
+			errorRes = { 
+				...errorInit,
+			};
+			break;
 
 		default:
 			errorRes = { 
 				...errorInit,
 				status: 500,
-				message: 'An unexpected error occurred.',
+				name: error.name || 'Error',
+				message: error.message || 'An unexpected error occurred.',
 				stack: error.stack,
 			};
 			break;

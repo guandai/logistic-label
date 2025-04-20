@@ -6,7 +6,7 @@ import { isValidJSON } from '../utils/errors';
 import { CsvRecord, defaultMapping, CSV_KEYS, HeaderMapping, KeyCsvRecord } from '@ddlabel/shared';
 import { CsvData, PreparedData, BatchDataType } from '../types';
 import { getErrorRes } from '../utils/getErrorRes';
-import { InvalidInputError, MissingFromZipError, MissingToZipError } from '../utils/errorClasses';
+import { MissingFromZipError, MissingToZipError } from '../utils/errorClasses';
 
 const getMappingData = (headers: CsvData, headerMapping: HeaderMapping): CsvRecord => {
 	return CSV_KEYS.reduce((acc: CsvRecord, csvKey: KeyCsvRecord) => {

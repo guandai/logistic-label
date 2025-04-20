@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { ValidationErrorItem } from 'sequelize';
 type CsvRecordRequired = {
 	weight: number,
 	fromAddressName: string,
@@ -53,3 +54,34 @@ export type SimpleRes = {
 
 export type ResponseAdv<T> = Response<T | SimpleRes>;
 export type ResponseSimple = Response<SimpleRes>;
+
+export type ErrorInstanceName =
+	"MissingToZipError" |
+	"MissingFromZipError" |
+	"TrackingnoMustBeUniqueError" |
+
+	"UnknownError" |
+	"UniqueConstraintError" |
+	"ValidationError" |
+	"ForeignKeyConstraintError" |
+	"DatabaseError" |
+	"TimeoutError" |
+	"ConnectionError" |
+	"OptimisticLockError" |
+	"NotFoundError" |
+	"InvalidCredentialsError" |
+	"InvalidInputError"
+
+export type ErrorRes = {
+	name: ErrorInstanceName | string,
+	original: any;
+	data: unknown;
+	status: number;
+	message: string;
+	errors?: ValidationErrorItem[];
+	parent?: Error;
+	sql?: string;
+	where?: Record<string, unknown>;
+	stack?: any;
+	lastFn?: string;
+}

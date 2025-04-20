@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { ErrorRes } from '@ddlabel/shared';
 
 type PackageRoot = PackageCreationAttributes;
 export interface AuthRequest extends Request {
@@ -16,7 +17,6 @@ export type BatchDataType = {
 	shipToArr: AddressCreationAttributes[],
 }
 
-
 export type CsvData = { [k: string]: string | number };
 
 export type PreparedData = {
@@ -24,35 +24,4 @@ export type PreparedData = {
 	fromZipInfo: any,
 	toZipInfo: any,
 	csvUploadErrors: ErrorRes[],
-}
-
-export type ErrorInstanceName =
-	"MissingToZipError" |
-	"MissingFromZipError" |
-	"TrackingnoMustBeUniqueError" |
-
-	"UnknownError" |
-	"UniqueConstraintError" |
-	"ValidationError" |
-	"ForeignKeyConstraintError" |
-	"DatabaseError" |
-	"TimeoutError" |
-	"ConnectionError" |
-	"OptimisticLockError" |
-	"NotFoundError" |
-	"InvalidCredentialsError" |
-	"InvalidInputError"
-
-export type ErrorRes = {
-	name: ErrorInstanceName,
-	original: any;
-	data: unknown;
-	status: number;
-	message: string;
-	errors?: ValidationErrorItem[];
-	parent?: Error;
-	sql?: string;
-	where?: Record<string, unknown>;
-	stack?: any;
-	lastFn?: string;
 }

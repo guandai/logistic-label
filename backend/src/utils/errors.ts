@@ -1,11 +1,11 @@
-import { ResponseAdv } from "@ddlabel/shared";
+import { ErrorRes, ResponseAdv } from "@ddlabel/shared";
 import moment from "moment";
 import { UniqueConstraintError } from "sequelize";
 import { NextFunction, Response } from "express";
 import logger from "../config/logger";
 import { aggregateError, getErrorRes } from "./getErrorRes";
 import { BatchCreationError } from "./errorClasses";
-import { BatchDataType, ErrorRes } from "../types";
+import { BatchDataType } from "../types";
 
 export const isValidJSON = (str: string) => {
 	try {

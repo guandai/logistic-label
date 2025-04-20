@@ -14,6 +14,17 @@ const fixErrorClass = (scope: any, errorClass: Function) => {
 	}
 }
 
+export class UnknownError extends Error {
+	public status: number;
+
+	constructor(message: string = 'No Message Unknown Error', name = 'UnknownError') {
+		super(message);
+		this.name = name;
+		this.status = 500;
+		fixErrorClass(this, NotFoundError);
+	}
+}
+
 export class NotFoundError extends Error {
 	public status: number;
 

@@ -31,7 +31,7 @@ export const fixCityState = <T extends AddressChange>(attr: T): T => {
     || getZipInfo(extractAddressZip(attr.address2))
     || getZipInfo(extractAddressZip(attr.address1));
   if (!info) {
-    throw new Error(`ZipInfo not found for ${attr.zip}`);
+    throw new Error(`ZipInfo not found for ${JSON.stringify(attr)}`);
   }
   return { ...attr, city: info.city, state: info.state };
 }
