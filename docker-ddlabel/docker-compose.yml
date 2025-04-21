@@ -2,9 +2,10 @@ version: '3.8'
 
 services:
   backend:
-    build:
-      context: ../
-      dockerfile: backend/Dockerfile
+    # build:
+    #   context: ../
+    #   dockerfile: backend/Dockerfile
+    image: guandai/ddlabel-backend:latest
     container_name: backend_service
     env_file:
       - ../backend/.env.production  # Specify the path to your .env file
@@ -14,11 +15,10 @@ services:
       - db
 
   frontend:
-    build:
-      context: ../
-      dockerfile: frontend/Dockerfile
-      # Remove the following line if you don't want to use a specific tag for your Docker image
-      # image: my-frontend-image:latest
+    # build:
+      #   context: ../
+      #   dockerfile: frontend/Dockerfile
+    image: guandai/ddlabel-frontend:latest
     container_name: frontend_service
     env_file:
       - ../frontend/.env.production # Specify the path to your .env file
