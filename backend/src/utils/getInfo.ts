@@ -1,6 +1,7 @@
 import { AddressChange, CsvRecord, PortInfo, ZipInfo } from '@ddlabel/shared';
 import stateDataJson from '../data/stateSmall.json';
 import portDataJson from '../data/portSmall.json';
+import { InvalidInputError } from './errorClasses';
 const stateData = stateDataJson as ZipInfo[];
 const portData = portDataJson as PortInfo[];
 type PortData = {
@@ -31,7 +32,8 @@ export const fixCityState = <T extends AddressChange>(attr: T): T => {
     || getZipInfo(extractAddressZip(attr.address2))
     || getZipInfo(extractAddressZip(attr.address1));
   if (!info) {
-    throw new Error(`ZipInfo not found for ${JSON.stringify(attr)}`);
+    const error = new InvalidInputError(`ZipInfo not found`, 'ZipInfo', attr);
+    throw error;
   }
   return { ...attr, city: info.city, state: info.state };
 }

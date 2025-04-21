@@ -20,7 +20,7 @@ export const setErrorCount = (
 	error: ErrorRes,
 	pkgGlobal: BatchDataType, 
 ) =>{
-	 	const name = error.name
+	 	const name = error.error_name
 		pkgGlobal.errorCount[name] = (pkgGlobal.errorCount[name] ?? 0) + 1
 	}
 

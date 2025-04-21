@@ -1,7 +1,8 @@
 import Button from "@mui/material/Button";
 import React from "react";
 
-export const DownloadErrorButton: React.FC<{ dataStr: string, text: String }> = ({ dataStr, text }) => (
+type Prop = { dataStr: string, text: String, format: "json" | "csv" }
+export const DownloadErrorButton: React.FC<Prop> = ({ dataStr, text, format }) => (
   <Button
     variant="contained"
     color="primary"
@@ -11,7 +12,7 @@ export const DownloadErrorButton: React.FC<{ dataStr: string, text: String }> = 
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'errorResults.json';
+      a.download = `errorResults.${format}`;
       a.click();
       URL.revokeObjectURL(url);
     }}

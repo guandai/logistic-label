@@ -73,9 +73,9 @@ export type ErrorInstanceName =
 	"InvalidInputError"
 
 export type ErrorRes = {
-	name: ErrorInstanceName | string,
+	error_name: ErrorInstanceName | string,
 	original: any;
-	data: unknown;
+	error_data: unknown;
 	status: number;
 	message: string;
 	errors?: ValidationErrorItem[];

@@ -30,12 +30,12 @@ export const getPreparedData = async (packageCsvMap: string, data: CsvData): Pro
 	const csvUploadErrors = [];
 
 	if (!fromZipInfo) { 
-		const error = new MissingFromZipError(`getPreparedData has no fromAddressZip: ${flatCsvData(data)}`);
-		csvUploadErrors.push( getErrorRes({ fnName: 'getPreparedData', error, data, disableLog: true } ) );
+		const error = new MissingFromZipError(`getPreparedData has no fromAddressZip`);
+		csvUploadErrors.push( getErrorRes({ error, data, fnName: 'getPreparedData', disableLog: true } ) );
 	}
 	if (!toZipInfo) { 
-		const error = new MissingToZipError(`getPreparedData has no toAddressZip: ${flatCsvData(data)}`);
-		csvUploadErrors.push ( getErrorRes( { fnName: 'getPreparedData', error, data, disableLog: true } ) );
+		const error = new MissingToZipError(`getPreparedData has no toAddressZip`);
+		csvUploadErrors.push ( getErrorRes( { error, data, fnName: 'getPreparedData', disableLog: true } ) );
 	}
 	return { mappedData, fromZipInfo, toZipInfo, csvUploadErrors };
 }

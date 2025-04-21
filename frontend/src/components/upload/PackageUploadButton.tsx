@@ -138,8 +138,8 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
       {runStatus === RunStatus.done && (
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', width: '100%' }}>
           <Box sx={{ flexGrow: 1 }}>
-            { !!errorResults?.length ? <DownloadErrorButton dataStr={jsonToTxt(errorResults)} text="Detail(JSON)" /> : null }
-            { !!errorResults?.length ? <DownloadErrorButton dataStr={jsonToCsv(errorResults)} text="Detail(CSV)" /> : null }
+            { !!errorResults?.length ? <DownloadErrorButton dataStr={jsonToTxt(errorResults)} text="Detail(JSON)" format="json" /> : null }
+            { !!errorResults?.length ? <DownloadErrorButton dataStr={jsonToCsv(errorResults)} text="Detail(CSV)" format="csv" /> : null }
           </Box>
           <Box sx={{ flexGrow: 1 }}>
             {closeButton}

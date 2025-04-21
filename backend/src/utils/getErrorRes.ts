@@ -48,8 +48,8 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 	const { fnName, error, data, name, status, disableLog = false } = params;
 	const errorInit = { 
 		original: error,
-		data,
-		name: name || error.constructor.name,  
+		error_data: data,
+		error_name: name || error.constructor.name,  
 		status: status || 400,
 		message: error.message || 'An error occurred.'
 	};
@@ -171,7 +171,7 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 			errorRes = { 
 				...errorInit,
 				status: 500,
-				name: error.name || 'Error',
+				error_name: error.name || 'Error',
 				message: error.message || 'An unexpected error occurred.',
 				stack: error.stack,
 			};

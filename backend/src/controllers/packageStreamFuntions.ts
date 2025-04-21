@@ -8,7 +8,6 @@ import reportIoSocket from '../utils/reportIo';
 import { getPreparedData, processBatch } from './packageBatchFuntions';
 import fs from 'fs';
 import { aggregateError, getErrorRes } from '../utils/getErrorRes';
-import { TrackingnoMustBeUniqueError } from '../utils/errorClasses';
 
 type OnDataParams = {
 	req: AuthRequest,
@@ -70,7 +69,6 @@ export const onData = async ({ req, csvData, pkgGlobal }: OnDataParams) => {
 	pkgGlobal.processed ++;
 	const prepared = await getPreparedData(packageCsvMap, csvData);
 	if ( prepared.csvUploadErrors.length > 0 ) {
-		console.log(`csvUploadErrors`, prepared.csvUploadErrors);
 		prepared.csvUploadErrors.forEach(error => {
 			setPkgErrors(error, pkgGlobal);
 		})
@@ -101,9 +99,15 @@ const formatErrorForFe = (key: string, count: number) =>
 const finishProcessing = (params: FinishEndParams) => {
 	const { res, pkgGlobal, file } = params;
 	deleteUploadedFile(file);
-	if (pkgGlobal.errorMap.length > 0 || Object.values(pkgGlobal.errorCount).some(x => x > 0)) {
+	if ( pkgGlobal.errorMap.length > 0 
+		|| Object.values(pkgGlobal.errorCount).some(x => x ? x > 0 : false)) {
 		// const errorMapsMsg = pkgGlobal.errorMap.map(e => e.message).join(',\n ');
-		const errorCountMsg = Object.entries(pkgGlobal.errorCount).map(([key, count]) => formatErrorForFe(key, count)).join('\n ');
+		const errorCountMsg = Object.entries(pkgGlobal.errorCount)
+			.filter(([_key, count]) => Number(count) > 0)
+			.map(([key, count]) => formatErrorForFe(key, count || 0))
+			.filter(Boolean)
+			.join('\n');
+			
 		return res.status(400).json({ 
 			errors: pkgGlobal.errorMap, 
 			message: `Importing Done with error: \n ${errorCountMsg}` });
@@ -131,8 +135,11 @@ export const onEnd = async (params: OnEndParams) => {
 		try {
 			await processBatch(batchData);
 		} catch (error: any) {
-			const trackError = new TrackingnoMustBeUniqueError(error)
-			const errorRes = getErrorRes({ fnName: 'onEnd', error: trackError });
+			const errorRes = getErrorRes({ 
+				fnName: 'onEnd', 
+				error, 
+				data: error.data
+			});
 			logger.error(`Error in onEnd: ${errorRes.message}`);
 			setPkgErrors(errorRes, pkgGlobal);
 		} finally {
