@@ -33,4 +33,4 @@ services:
     ports:
       - "3316:3306"
     volumes:
-      - /usr/local/var/mysql/:/var/lib/mysql
+      - /usr/local/var/mysql/:/var/lib/mysql/

@@ -14,10 +14,11 @@ if (env === 'production') {
 // Create a new Sequelize instance
 const sequelize = new Sequelize({
   dialect: 'mysql',
-  host: process.env.DB_HOST,
-  username: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
+  host: process.env.MYSQL_TCP_HOST,
+  port: Number(process.env.MYSQL_PORT),
+  username: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
   // logging: (msg) => logger.info(msg), // Use logger for logging
   logging: false,
   pool: {
