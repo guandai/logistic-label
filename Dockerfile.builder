@@ -1,5 +1,5 @@
 # === Builder Stage ===
-FROM node:18-alpine AS builder
+FROM --platform=linux/amd64 node:18-alpine AS builder
 # Enable Corepack and prepare Yarn 4.8.1
 RUN npm install -g corepack && \
     corepack enable && \
