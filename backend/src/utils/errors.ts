@@ -45,18 +45,18 @@ export const toCamelCase = (str: string): string =>
 		})
 		.join('');  // Join all the words without spaces
 
-export const reducedConstraintError = (error: UniqueConstraintError) => {
-	const stacks = error.stack?.split('\n')
-	const lastFn = stacks?.pop()?.split(' ')[5] || '';
-	const batchError = new BatchCreationError({
-		...error,
-		message: error.errors?.[0]?.message || 'Unique constraint error: Duplicate value detected.',
-		original: error,
-		lastFn: lastFn,
-	});
+// const reducedConstraintError = (error: UniqueConstraintError) => {
+// 	const stacks = error.stack?.split('\n')
+// 	const lastFn = stacks?.pop()?.split(' ')[5] || '';
+// 	const batchError = new BatchCreationError({
+// 		...error,
+// 		message: error.errors?.[0]?.message || 'Unique constraint error: Duplicate value detected.',
+// 		original: error,
+// 		lastFn: lastFn,
+// 	});
 
-	return aggregateError(batchError);
-}
+// 	return aggregateError(batchError);
+// }
 
 export const ReturnMsg = <T>(res: ResponseAdv<T>, message: string, code = 400) => res.status(code).json({ message });
 

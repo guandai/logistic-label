@@ -18,10 +18,10 @@ const reducedError = (error: Error | ValidationErrorItem) => {
         .map(([key, value]) => `-> [${key}]: ${value}`).join('\n')}\n`;
 };
 
-export const aggregateError = (error: UniqueConstraintError | Error[] | Error): string => {
+export const aggregateError = (error: UniqueConstraintError | Error): string => {
 	if (!error) return '';
-	const constructorName = error.constructor.name;
-	const title = `\n[Error Instance] ${constructorName}: `;
+	const ename = error.name || error.constructor.name;
+	const title = `\n[Error Instance] ${ename}: `;
 
 	if (error instanceof UniqueConstraintError) {
 		return `${title} ${error.errors.map(reducedError).join(', ')}`;
@@ -49,7 +49,7 @@ export const getErrorRes = (params: SequelizeErrorParams): ErrorRes => {
 	const errorInit = { 
 		original: error,
 		error_data: data,
-		error_name: name || error.constructor.name,  
+		error_name: name || error.name || error.constructor.name,  
 		status: status || 400,
 		message: error.message || 'An error occurred.'
 	};
