@@ -84,15 +84,16 @@ export const PackageUploadButton: React.FC<Prop> = (prop: Prop) => {
 
       setRunStatus(RunStatus.done);
       setUploadSuccess(`Import Done - ${response.message}`);
-      
+      console.log(`done1 >> response`, response);
     } catch (error: any) {
+      console.log(`error1 >> response`, error?.response);
       const errMsg = error?.constructor.name === 'AxiosError' 
         ? error?.response?.data?.message 
         : error?.message;
       const errErrors = error?.constructor.name === 'AxiosError' 
         ? error?.response?.data?.errors 
         : error?.errors;
-
+      console.log(`error2 >> response`, error?.response);
       setUploadError(errMsg || 'Failed to import packages.');
       setRunStatus(RunStatus.done);
       setErrorResults(errErrors);
