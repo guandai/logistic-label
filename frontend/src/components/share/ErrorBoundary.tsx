@@ -31,8 +31,5 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     return this.props.children;
   }
 }
-function logErrorToMyService(error: any, componentStack: any, arg2: any) {
-  throw new Error('Function not implemented.');
-}
 
 export default ErrorBoundary;
